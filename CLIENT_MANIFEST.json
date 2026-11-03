@@ -15,19 +15,19 @@
     },
     "README.md": {
       "bytes": 4402,
-      "sha256": "25e014f1a213ce1a12254deca1a71d00df9bdf81ff3b01e1ce63ed4170c05b7a"
+      "sha256": "522f795a9e902aa8da24a03ab4f6e058320be1e1d29732f95a30286bbc7eeeb6"
     },
     "VERSION": {
       "bytes": 22,
-      "sha256": "ae7cb7c96aaf56247c4f325096686f972af41db540d450f9485f43798b0791ca"
+      "sha256": "b9400d6886457c5c959aa7b1f12940feadf425e9dd6846d34d0d5fcf42f6237b"
     },
     "account.py": {
       "bytes": 12717,
       "sha256": "28cd5ad8215da717d5c51341414827d35fba5dec7ca22d51c18f599aa1eb3b0e"
     },
     "browser.py": {
-      "bytes": 16201,
-      "sha256": "6e2f7e77a8124b46c88e0e27b071af133ca91ed496ed38080052fd8850c1c968"
+      "bytes": 26326,
+      "sha256": "fbf0984a442fe11b1f0b382330b64a0d14c70e36cd93192b1247783623eca79b"
     },
     "client.py": {
       "bytes": 60205,
@@ -46,8 +46,8 @@
       "sha256": "b926a5a3671ae27deb89069d4d519099036a77b9a5f69968783b5a0e43d45ee1"
     },
     "docs/FAQ.md": {
-      "bytes": 4641,
-      "sha256": "5cd7773ce41b924932bff559effdd6f6b7c639f855d7a16f09f7215a434b5feb"
+      "bytes": 5606,
+      "sha256": "ecec2a84946cb4ba90f96758c34c0db9c196a75af0ed279f2a34c185b5d34838"
     },
     "docs/README.md": {
       "bytes": 238,
@@ -62,28 +62,28 @@
       "sha256": "57f3d1026a4b6f9715d254820df1b63cd05c7d6f1d26ecb9db1fc8aef0ce9178"
     },
     "panel.css": {
-      "bytes": 13527,
-      "sha256": "e34b01baae43e34a45f74ffd3a9962b982aa8dfc929bee8a4605f65ede63e423"
+      "bytes": 14010,
+      "sha256": "e94501aea8eecbdea3a148d47855ad626aab404f347dfba6b4f1801e9bd201e0"
     },
     "panel.html": {
-      "bytes": 18964,
-      "sha256": "e850e972f766605de04eb28b39de9e7b397bd899fe6e089ba5c72d7a6a0f7ed5"
+      "bytes": 19045,
+      "sha256": "2414dfbc5892f27b3b81b70dbdbf8ec9fd141ac483fcdd3fba2334c9be6a8914"
     },
     "panel.js": {
-      "bytes": 48195,
-      "sha256": "410741ec06768ff18a794eabb86bb3eeceaa0e74148394a8348f51507f037412"
+      "bytes": 48227,
+      "sha256": "23ec2da2bfe06d5f0a47a6082bf65821651cf05336f5adbf0ec013b656673e5a"
     },
     "panel.py": {
-      "bytes": 61726,
-      "sha256": "fd0394e66984e295bea7659f4d33835360b0cb4c8b75e723887c5acd97e37fe8"
+      "bytes": 62410,
+      "sha256": "06cdb425ac705e034af57350b64d0f5560066047b58e02c06616397e369edec0"
     },
     "sensitive_domains.json": {
       "bytes": 2032,
       "sha256": "f2d87fb601a864a9b2679381be3bec374dbddb53a3ef2ab17e0c89574a82e02c"
     },
     "setup.py": {
-      "bytes": 23081,
-      "sha256": "65dc7d89da47da1fea16a6cf1f404f96304c928ebeb1d23c4442ebaf315e6b85"
+      "bytes": 24256,
+      "sha256": "7fd665865fdba77628af84a4f652b226ce65c6c9f3a95b22b3279d3fbabce111"
     },
     "skills/eh-subscription-browser/SKILL.md": {
       "bytes": 29860,
@@ -109,5 +109,5 @@
   "integrity_only": true,
   "publisher_authentication": false,
   "schema": "eh-client-source/1",
-  "version": "0.25.4-lab.20261104.1"
+  "version": "0.25.5-lab.20261104.1"
 }

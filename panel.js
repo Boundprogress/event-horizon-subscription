@@ -16,7 +16,7 @@ function errorMessage(e){return messages[e.code]||('操作未完成：'+(e.code|
 async function request(path,body){let result;try{result=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+capability,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',credentials:'omit',redirect:'error'});}catch(_){throw {code:'response_unknown_check_remote_state'};}
 let value;try{value=await result.json();}catch(_){throw {code:'response_unknown_check_remote_state'};}
 if(!result.ok)throw {code:value.error||'request_failed'};return value;}
-function choose(name){if(view!==name)window.scrollTo({top:0});view=Object.hasOwn(titles,name)?name:'overview';name=view;document.querySelectorAll('[data-page]').forEach(x=>x.hidden=x.dataset.page!==name);document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.view===name));$('view-title').textContent=titles[name];}
+function choose(name){if(view!==name){$('main-content').scrollTop=0;window.scrollTo({top:0});}view=Object.hasOwn(titles,name)?name:'overview';name=view;document.querySelectorAll('[data-page]').forEach(x=>x.hidden=x.dataset.page!==name);document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.view===name));$('view-title').textContent=titles[name];}
 function date(value){return typeof value==='number'&&Number.isFinite(value)&&value>0?new Date(value*1000).toLocaleString('zh-CN',{hour12:false}):'—';}
 function renderUpdates(){const u=state.updates||{status:'installer_required'};
 const source=u.status==='source_manual';

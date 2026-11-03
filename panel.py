@@ -95,7 +95,7 @@ def identifier(value, *, session=False):
 
 
 def diagnostic_summary(value):
-    
+
     if not isinstance(value, dict): return {}
     result = {}
     enums = {'status': {'checked', 'failed'}, 'mode': {'online', 'offline'},
@@ -127,7 +127,7 @@ def device_connection_rejected(connection):
 
 
 def onboarding(state, now=None):
-    
+
     now = time.time() if now is None else now
     cloud = state.get('cloud')
     c = state.get('connection') or {}
@@ -158,7 +158,7 @@ def onboarding(state, now=None):
 
 
 class Store:
-    
+
     def __init__(self, directory, endpoint):
         self.setup = sibling('setup')
         endpoint = self.setup.api_config({'endpoint': endpoint, 'token': 'anonymous-placeholder', 'timeout': 12})['endpoint']
@@ -234,7 +234,7 @@ class Store:
 
 
 def remote(config, calls):
-    
+
     request = json.dumps({'config':config,'calls':calls}).encode()
     try:
         done = subprocess.run([sys.executable,'-I','-S','-B',str(Path(__file__).resolve()),'_remote'],input=request,capture_output=True,timeout=16)
@@ -259,12 +259,13 @@ class Connection:
     def __init__(self, setup):
         self.setup=setup; self.proc=None; self.thread=None; self.lock=threading.Lock(); self.last={}; self.directory=None
 
-    def start(self, api, device, directory, *, chrome=None, headless=False):
+    def start(self, api, device, directory, *, chrome=None, headless=False, reuse_profile=False):
         if self.proc is not None: raise PanelError('connection_already_started')
         self.directory=directory
         args=[sys.executable,'-I','-S','-B',str(HERE/'setup.py'),'run','--api-config',str(api),'--device-config',str(device),'--directory',str(directory)]
         if chrome: args+=['--chrome',chrome]
         if headless: args+=['--headless']
+        if reuse_profile: args+=['--reuse-profile']
         self.last={'status':'starting'}
         self.proc=subprocess.Popen(args,stdin=subprocess.PIPE if win else subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,env=dict(os.environ,EH_STOP_STDIN="1") if win else None)
         self.thread=threading.Thread(target=self.read,name='eh-console-setup-output',daemon=True);self.thread.start()
@@ -313,7 +314,7 @@ class Connection:
 
 
 class UpdateBridge:
-    
+
     def __init__(self, launcher=None, root=None, notice=None):
         self.launcher=launcher;self.root=root;self.lock=threading.Lock()
         self.source_manual=launcher is None and root is None
@@ -368,6 +369,18 @@ class Console:
         if kind in {'login','key'} and value['endpoint']!=self.store.data['endpoint']:raise PanelError('credential_endpoint_mismatch')
         return value
 
+    def browser_directory(self):
+
+        self.store.check()
+        account = text(self.store.data.get('account'))
+        endpoint = urlsplit(self.store.data['endpoint'])
+        host = endpoint.hostname.encode('idna').decode('ascii').lower()
+        origin = [endpoint.scheme.lower(), host,
+                  endpoint.port if endpoint.port is not None else (443 if endpoint.scheme == 'https' else 80)]
+        namespace = json.dumps(['eh-browser-account-v1', origin, account],
+                               ensure_ascii=True, separators=(',', ':')).encode()
+        return self.store.root / ('browser-account-' + hashlib.sha256(namespace).hexdigest())
+
     def disconnected(self):
         self.sync_connection()
         v=self.store.data.get('connection')
@@ -418,7 +431,7 @@ class Console:
         self.store.commit()
 
     def code_operation(self, op, body):
-        
+
         if self.store.data.get('pending'): raise PanelError('previous_operation_requires_review')
         self.disconnected()
         if op == 'recovery_cancel':
@@ -542,7 +555,7 @@ class Console:
 
     @staticmethod
     def activation_receipt(value):
-        
+
         if not isinstance(value, dict): raise PanelError('invalid_remote_response')
         result = {}
         for key in ('activation_id', 'request_id', 'plan_id'):
@@ -566,7 +579,7 @@ class Console:
         return {'receipts': receipts, 'pending_confirmed': confirmed}
 
     def prepare(self):
-        
+
         if self.store.data.get('pending'): raise PanelError('previous_operation_requires_review')
         self.disconnected()
         self.refresh()
@@ -871,9 +884,9 @@ class Console:
                 return result
             if self.store.data.get('pending'):raise PanelError('previous_operation_requires_review')
             self.disconnected();self.setup.check(api,device,self.chrome)
-            directory=self.store.root/('browser-'+uuid.uuid4().hex)
+            directory=self.browser_directory()
             self.store.data['connection']={'status':'starting','clean':False,'directory':str(directory)};self.store.commit()
-            try:self.connection.start(api,device,directory,chrome=self.chrome,headless=self.headless)
+            try:self.connection.start(api,device,directory,chrome=self.chrome,headless=self.headless,reuse_profile=True)
             except Exception:
                 if self.connection.proc is None:
                     self.store.data['connection']={'status':'failed','clean':True,'browser_cleanup':'not_started'}

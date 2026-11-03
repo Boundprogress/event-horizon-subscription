@@ -50,7 +50,7 @@ def _pairs(items):
 
 
 def secure_json(path, *, limit=MAX_CONFIG):
-    
+
     if win:
         try: return win.secure_json(path, limit)
         except Exception: raise SetupError("private_file_unreadable") from None
@@ -327,7 +327,7 @@ def observe_stopped(path, snapshot, stamp, recorded, seconds=5):
 
 
 def first_error_summary(first):
-    
+
     safe_keys = {"schema", "reason", "phase", "at_unix", "monotonic_ns", "owner_pid",
                  "epoch", "exception_class", "errno", "ssl_reason"}
     result = {key: value for key, value in first.items() if key in safe_keys
@@ -359,8 +359,8 @@ def cleanup_diagnostic(error):
     return {"class": "LauncherError", "reason": reason}
 
 
-def run_owned(device, directory, *, chrome=None, headless=False, browser=None, factory=None, on_status=None):
-    
+def run_owned(device, directory, *, chrome=None, headless=False, browser=None, factory=None, on_status=None, reuse_profile=False):
+
     browser = browser or sibling("browser")
     factory = factory or sibling("connector").Connector
     previous = {}
@@ -369,6 +369,7 @@ def run_owned(device, directory, *, chrome=None, headless=False, browser=None, f
     stamp = None
     launched = False
     state_path = None
+    profile_lease = None
     requested = [None]
     watcher = None
     watching_done = threading.Event()
@@ -388,7 +389,11 @@ def run_owned(device, directory, *, chrome=None, headless=False, browser=None, f
     try:
         for number in signals:
             previous[number] = signal.signal(number, request_stop)
-        started = browser.start(directory, chrome=chrome, headless=headless)
+        if reuse_profile:
+            profile_lease = browser.profile_lease(directory)
+            started = browser.start(directory, chrome=chrome, headless=headless, reuse_profile=True, lease=profile_lease)
+        else:
+            started = browser.start(directory, chrome=chrome, headless=headless)
         launched = True
         state_path, snapshot = browser.read_state(started["state_path"])
         stamp = ownership_stamp(state_path)
@@ -408,8 +413,14 @@ def run_owned(device, directory, *, chrome=None, headless=False, browser=None, f
                 watcher.start()
             connection.run()
             report["connector"] = "stopped"
-    except Exception:
+    except Exception as error:
         report.update(status="failed", error="startup_or_connector_failed")
+        if (reuse_profile and isinstance(error, getattr(browser, 'BrowserError', ()))
+                and str(error) in {'profile_in_use', 'profile_in_use_or_unsafe_lock',
+                                   'profile_reuse_requires_review', 'profile_identity_changed',
+                                   'profile_exit_not_verified', 'unsafe_profile_directory',
+                                   'unsafe_profile_runtime_file', 'unsafe_profile_lock', 'invalid_profile_lease'}):
+            report['first_error'] = {'schema': 'eh-browser-error/1', 'reason': str(error), 'phase': 'profile'}
         if connection is not None:
             report["connector"] = "failed"
             first = getattr(connection, "first_error", None)
@@ -463,8 +474,12 @@ def run_owned(device, directory, *, chrome=None, headless=False, browser=None, f
                 except (ChildProcessError, KeyError, OSError):
                     pass
         finally:
-            for number, handler in previous.items():
-                signal.signal(number, handler)
+            try:
+                if profile_lease is not None:
+                    profile_lease.close()
+            finally:
+                for number, handler in previous.items():
+                    signal.signal(number, handler)
     if requested[0] is not None:
         report["stop_signal"] = requested[0]
     report["profile_retained"] = True
@@ -487,7 +502,8 @@ def main(argv=None):
         if name == "diagnose":
             entry.add_argument("--online", action="store_true", help="explicitly allow HTTPS GET and connector TLS")
         if name == "run":
-            entry.add_argument("--directory", required=True, help="new dedicated browser directory; must not exist")
+            entry.add_argument("--directory", required=True, help="dedicated browser directory; new unless --reuse-profile is set")
+            entry.add_argument("--reuse-profile", action="store_true", help="reuse this managed profile only after verified shutdown")
             entry.add_argument("--headless", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -501,7 +517,7 @@ def main(argv=None):
                 _, device = load_configs(args.api_config, args.device_config)
                 print(json.dumps({"status": "starting", "mode": "foreground", "stop": "Ctrl-C"}), flush=True)
                 result = run_owned(device, args.directory, chrome=args.chrome, headless=args.headless,
-                                   on_status=lambda value: print(json.dumps(value), flush=True))
+                                   reuse_profile=args.reuse_profile, on_status=lambda value: print(json.dumps(value), flush=True))
         print(json.dumps(result, ensure_ascii=False), flush=True)
         return 0 if result["status"] in ("checked", "stopped") else 2
     except SetupError as exc:

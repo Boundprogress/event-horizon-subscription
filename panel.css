@@ -10,7 +10,7 @@
 
 .table-wrap button{white-space:nowrap}
 
-                                                                              
+
 .onboarding-guide{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 28px;margin-bottom:24px;border:1px solid var(--line,#d9dedc);border-radius:18px;background:#f1f6f2}.onboarding-guide h2{font-size:22px;margin:8px 0}.onboarding-guide p{margin:0;max-width:660px;line-height:1.7}.onboarding-guide button{flex-shrink:0}@media(max-width:800px){.onboarding-guide{align-items:stretch;flex-direction:column}.onboarding-guide button{align-self:flex-start}}
 
 
@@ -19,7 +19,7 @@
 
 .recovery-card{margin:24px 0;padding:22px;border:1px solid var(--line,#d8ddd6);border-radius:16px}.recovery-card p{line-height:1.65}.recovery-card .compact-form{margin:18px 0}
 
-                                                                    
+
 .terms { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; line-height: 1.75; }
 .terms h1 { font-size: 1.5rem; margin: 0 0 1.5rem; }
 .terms h2 { font-size: 1.15rem; margin: 2rem 0 .75rem; }
@@ -36,3 +36,15 @@
 .auth-actions{display:flex;align-items:stretch;gap:10px;margin-top:4px}.auth-actions .primary{flex:1;width:auto;margin:0}.auth-actions .secondary{flex:none;white-space:nowrap}@media(max-width:520px){.auth-actions{flex-wrap:wrap}.auth-actions .primary,.auth-actions .secondary{flex:1 1 100%;width:100%}}
 
 #appeal-open{margin-top:12px;align-self:flex-start}.appeal-history{padding-left:22px}.appeal-history li{padding:14px 0;border-bottom:1px solid var(--line,#dce2db);overflow-wrap:anywhere}.appeal-history p{white-space:pre-wrap;margin:6px 0}.appeal-history .hint{font-size:12px}#appeal-form textarea{width:100%;resize:vertical;min-height:112px}#appeal-contact{overflow-wrap:anywhere}
+
+@media(min-width:721px){
+.shell{height:100vh;height:100dvh;min-height:0;overflow:hidden}
+.rail{height:100%;min-height:0;padding-bottom:22px;overflow:hidden}
+.rail-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.rail-content>.brand,.rail-content>nav,.rail-note{flex-shrink:0}
+.rail-note{padding-top:32px}
+.rail-footer{flex-shrink:0;padding-top:18px}
+.rail-footer .version{margin:0 0 12px}
+.rail-footer #quit{width:100%;color:#d3ded5}
+.shell>main{height:100%;min-height:0;min-width:0;margin:0 auto;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+}
