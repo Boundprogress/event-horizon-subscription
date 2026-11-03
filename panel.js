@@ -5,9 +5,10 @@ if(capability){sessionStorage.setItem('eh-console-access',capability);history.re
 let termsRenderKey=null,appealHistory=null;
 let state=null,busy=false,mode='login',view='overview',reauth=false,closing=false;
 let supportReport=null,displayAccount=null,activationReceipts=null,agentLink=null,agentScope=null;
+let awaitingConnectionFeedback=false;
 const titles={overview:'准备好，让浏览器开始工作。',account:'购买、激活，再开始使用。',diagnostics:'让连接状态清楚可见。'};
 const messages={terms_required:'请阅读并显式确认当前协议后再发起新的网页任务。',terms_update_required:'本机展示的协议与服务端版本或正文不同，请更新客户端后重新阅读。',terms_document_unavailable:'本机协议正文缺失或校验失败，请更新客户端。',invalid_request_reference:'请填写有效请求号：1–64 位字母、数字、点、下划线或短横线。',session_not_found:'未找到该任务。请核对原编号和当前账号；查询结果不代表可以重放操作。',request_not_found:'未找到该请求。请核对原编号；不要据此认定操作未执行或直接重放。',forbidden:'当前账号无权读取该记录。',unauthorized:'当前 Key 无效，请核对凭据。',invalid_remote_response:'服务返回格式异常，请稍后按原编号查询。',active_key_exists_rotate_required:'账号已有连接配置，请刷新状态后在连接诊断中核对。',active_key_changed_refresh_required:'有效 Key 已变化，请刷新核对后再操作。',subscription_disabled:'账号权益已停用，请联系运营核对；重复激活不会解除停用。',subscription_quota:'本月额度已用完。',subscription_not_started:'订阅尚未开始。',invalid_identifier:'名称仅支持 1–64 位英文字母、数字、点、下划线和短横线。',invalid_username:'用户名须为 1–64 个字符，支持中文和自定义名称；请勿使用控制字符或不可见字符。',console_access_required:'请从启动器重新打开控制台链接。',invalid_credentials:'用户名或密码不正确。',username_taken:'该用户名已注册，请登录。',account_login_required:'登录已过期，请重新登录。',login_required:'请先登录。',subscription_inactive:'账号尚未激活，请在购买与激活页输入激活码。',subscription_expired:'订阅已到期。',quota_exhausted:'本期额度已用完。',credentials_required:'请先点击准备本机使用，完成连接配置。',service_update_required:'服务端尚未升级到支持协议版本的版本，暂时无法注册；请联系运营更新服务。',previous_operation_requires_review:'上次请求尚未确认，请先核对远端状态。',response_unknown_check_remote_state:'响应未确认，操作可能已生效。请刷新并核对状态，不要重复提交。',disconnect_or_review_previous_connection:'请先断开浏览器；若上次异常退出，需要核实原浏览器的退出状态。',device_already_registered_rotate_if_credential_lost:'设备已经登记。若本机凭据丢失，请核对后换发设备凭据。',device_not_registered:'请先登记设备。',operation_in_progress:'上一个操作仍在处理中，请稍候。',api_key_limit:'Key 历史记录已达上限，请联系运营。',chrome_not_found:'未找到 Chrome，请先安装 Chrome。',private_directory_required:'数据目录必须仅供当前用户访问。',device_waiting_for_hub:'设备变更已保存，连接服务尚未确认应用；这还不代表设备已连接。',previous_connection_unconfirmed:'上次连接未确认退出。请核实旧浏览器和连接器状态后再使用新的数据目录。'};
-function say(message,error=false){$('feedback').hidden=false;$('feedback').className=error?'error':'';$('feedback').textContent=message;}
+function say(message,error=false){awaitingConnectionFeedback=false;$('feedback').hidden=false;$('feedback').className=error?'error':'';$('feedback').textContent=message;}
 Object.assign(messages,{activation_code_invalid_or_unavailable:'激活码无效或不可使用，请核对完整内容或联系购买渠道。',activation_request_conflict:'该请求号已用于另一激活码，请先查询激活记录。',activation_rate_limited:'激活操作过于频繁，请稍后再试。',subscription_reactivation_review_required:'账号权益已停用，需要运营核对后恢复；购买或重复激活不能解除停用。',email_service_unavailable:'邮箱服务尚未启用，请联系运营。',email_queue_busy:'邮件队列繁忙，请稍后重新申请。',email_rate_limited:'申请或验证过于频繁，请15分钟后再试。',invalid_email:'请填写有效的邮箱地址。',email_proof_invalid_or_expired:'凭证无效、已过期或已使用，请检查完整内容或重新申请。',email_already_verified:'该账号已经验证邮箱，请使用更换邮箱。',email_not_verified:'请先验证首次绑定邮箱。',email_unchanged:'新邮箱须与当前绑定不同。',account_recovery_requires_quiet:'账号仍有业务任务，请先联系运营核对并关闭任务。',invalid_login:'用户名或密码不正确。'});
 Object.assign(messages,{email_code_invalid_or_expired:'验证码不正确、已过期或已使用。请核对6位数字，或点击重新申请。',email_already_registered:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_in_use:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_unavailable:'该邮箱暂不可用于注册，请使用账号找回或换一个邮箱。',email_required:'注册时请填写邮箱，并在注册后完成邮箱验证。',email_not_pending:'当前没有待验证的注册邮箱，请刷新账号状态。',recovery_response_unknown_restart:'找回响应未确认，原操作可能已生效；不会自动重试。请尝试新密码登录，或点击重新申请验证码。',email_response_unknown_restart:'邮箱验证响应未确认，原操作可能已生效；不会自动重试。请刷新邮箱状态，未验证时可明确重新发送验证码。'});
 Object.assign(messages,{appeal_request_conflict:'该申诉请求号已用于不同内容，请查询原申诉。',appeal_pending_exists:'已有待处理申诉，请查询处理状态。',appeal_not_eligible:'账号当前没有受限审核标记，请刷新状态；未激活或到期请按激活/续期流程处理。',appeal_state_changed:'账号或申诉状态已变化，请重新查询。',invalid_appeal_reason:'请填写1–1000字申诉说明，勿包含密码、验证码、Key、凭据或网页任务正文。',appeals_service_update_required:'当前控制台或服务端尚未支持站内申诉，请更新客户端并联系运营。现有状态查询和账号功能可继续使用。',appeal_rate_limited:'申诉提交过于频繁，请等待现有处理或稍后再试。',appeal_query_required:'请先按原请求号查到本人申诉，再解除本机核对提示。'});
@@ -32,6 +33,7 @@ login:['登录后继续','注册或登录你的账号。','登录','account'],
 refresh:['先核对账号状态','读取最新权益和本机接入状态后，再继续。','刷新账号状态','refresh'],
 review_operation:['上次操作还需核对','操作可能已经生效。请在连接诊断中核对，必要时联系运营；不要重复创建或换发。','查看诊断','diagnostics'],
 review_connection:['先确认旧浏览器已退出','上次清理未确认。请在诊断页检查退出状态，再连接新的浏览器。','查看诊断','diagnostics'],
+review_device_connection:['设备连接被云端拒绝','本机专属 Chrome 已关闭。可能是设备凭据已失效，也可能有其他端正在连接。请先停止其他端，再重试连接；仍需在本机使用时，可到诊断页确认换发设备凭据。','核对设备连接','diagnostics'],
 activation_review:['账号权益需要审核','请联系运营核对并恢复权益。购买激活码不能解除停用，已有激活记录仍可查询。','查看账号状态','account'],
 activation:['购买并激活 Key','通过外部渠道或联系运营购买激活码，然后在账号页激活。','去激活','account'],
 expired:['订阅已到期','购买激活码并激活续期，再继续使用。','激活续期','account'],
@@ -74,12 +76,22 @@ function connectionRepair(){
   return null;
  }
  if(stage==='recover_device')return cloud.device?.registered===true?{op:'device_rotate',body:{},label:'换发本机设备凭据',copy:'本机设备凭据缺失或不匹配。换发会使旧设备凭据失效。',confirm:'确认原设备已停止使用，并换发设备凭据保存到本机？'}:{op:'device_enroll',body:{},label:'重新登记本机设备',copy:'账号尚未登记设备，请确认后为本机登记。',confirm:'确认为当前账号登记本机设备？'};
+ if(stage==='review_device_connection'&&cloud.device?.registered===true)return {op:'device_rotate',body:{},label:'确认后换发设备凭据',copy:'云端拒绝了设备连接，本机专属 Chrome 已关闭。请先停止其他端的连接，再从概览重试；拒绝也可能由连接占用引起，不一定是凭据失效。若仍要在本机使用，可确认换发，旧端设备凭据将失效。',confirm:'确认继续在本机使用，并换发设备凭据？旧端设备凭据将立即失效，请先停止其他端的连接。换发后仍需手动连接验证，不会自动连接或重放网页动作。'};
  if(stage==='enable_device'&&cloud.device?.registered===true)return {op:'device_enable',body:{},label:'启用本机设备',copy:'设备已停用。请核对停用原因，再决定是否恢复连接。',confirm:'确认已核对停用原因，并重新启用本机设备？'};
  return null;
 }
 function connectionRepairBlocked(){const c=state?.connection||{};return busy||closing||!state?.signed_in||Boolean(state?.pending)||c.running===true||c.status==='starting'||c.status==='connected'||c.clean===false;}
 function renderConnectionRepair(){const repair=connectionRepair();$('connection-repair-card').hidden=!repair;$('connection-repair-copy').textContent=repair?.copy||'';$('connection-repair').textContent=repair?.label||'核对后修复';$('connection-repair').disabled=!repair||connectionRepairBlocked();}
 $('connection-repair').onclick=async()=>{const repair=connectionRepair();if(!repair||connectionRepairBlocked()||!confirm(repair.confirm))return;await act(repair.op,repair.body);};
+function connectionFailureMessage(){const c=state?.connection||{};
+ if(c.clean===false||c.status==='cleanup_unknown')return '浏览器退出尚未确认，请在连接诊断中核实清理状态后再继续。';
+ if(c.clean===true&&c.first_error?.reason==='hub_rejected_connection'&&c.first_error?.phase==='hello')return guideStages.review_device_connection[1];
+ return '浏览器连接未成功。请查看连接诊断中的错误详情；不会自动重连或重放网页动作。';
+}
+function updateConnectionFeedback(){if(!awaitingConnectionFeedback)return;const c=state?.connection||{};
+ if(c.status==='connected')say('专属浏览器已连接，可以让 Agent 发起任务。');
+ else if(['failed','stopped','cleanup_unknown'].includes(c.status))say('连接未成功。'+connectionFailureMessage(),true);
+}
 function render(){if(!state)return;const scope=currentAgentScope();if(scope!==agentScope){clearAgentLink();agentScope=scope;}const identity=state.signed_in?state.account:null;if(identity!==displayAccount){clearAccountViews();displayAccount=identity;}renderUpdates();renderOnboarding();renderAppeals();const s=state,cloud=s.cloud,c=s.connection||{},running=c.running===true||c.status==='starting'||c.status==='connected',ready=s.credentials.api_ready&&s.credentials.device_ready;
 $('auth').hidden=s.signed_in&&!reauth;$('recovery').hidden=s.signed_in&&!reauth;$('workspace').hidden=!s.signed_in||reauth;$('endpoint').textContent=s.endpoint;$('auth-endpoint').textContent=s.endpoint;$('version').textContent='EH / '+s.version;
 $('username').textContent=s.username||'账号';
@@ -94,8 +106,8 @@ $('terms-status').textContent=matching?'服务端需要你显式确认本机展�
 $('terms-accept-form').querySelector('button').disabled=busy||Boolean(s.pending)||!matching;
 const status={offline:'未连接',starting:'正在连接',connected:'已连接',stopped:'已断开',failed:'连接失败',cleanup_unknown:'退出待核实'};
 $('connection-badge').textContent=status[c.status]||'未连接';$('connection-badge').className='badge'+(c.status==='connected'?' online':'');
-$('connection-title').textContent=c.status==='connected'?'浏览器已连接':running?'正在准备浏览器':'连接你的本地浏览器';
-$('connection-copy').textContent=c.status==='connected'?'本机浏览器已接入 EH。现在可以让你的 agent 发起任务。':c.status==='cleanup_unknown'||s.notice==='previous_connection_unconfirmed'?'上次退出未获确认。请保留原会话目录，先核实进程状态。':'激活后准备本机连接，再启动专属 Chrome。';
+$('connection-title').textContent=c.status==='connected'?'浏览器已连接':running?'正在准备浏览器':s.onboarding?.stage==='review_device_connection'?'设备连接被云端拒绝':'连接你的本地浏览器';
+$('connection-copy').textContent=c.status==='connected'?'本机浏览器已接入 EH。现在可以让你的 agent 发起任务。':c.status==='cleanup_unknown'||s.notice==='previous_connection_unconfirmed'?'上次退出未获确认。请保留原会话目录，先核实进程状态。':s.onboarding?.stage==='review_device_connection'?guideStages.review_device_connection[1]:'激活后准备本机连接，再启动专属 Chrome。';
 $('connect').disabled=busy||!ready||running||Boolean(s.pending)||c.clean===false;$('disconnect').disabled=busy||!running;$('agent-connect').disabled=busy||closing||!s.signed_in||!s.credentials.api_ready;
 $('prepare').disabled=busy||!s.signed_in||running||Boolean(s.pending)||c.clean===false;$('activation-form').querySelector('button').disabled=busy||running||Boolean(s.pending)||cloud?.activation_review_required===true;$('activation-review-note').hidden=cloud?.activation_review_required!==true;$('activation-receipts').disabled=busy||!s.signed_in;$('refresh').disabled=busy||!s.signed_in;$('logout').disabled=busy||running;$('relogin').disabled=busy||running;
 for(const id of ['check','diagnose'])$(id).disabled=busy||!ready;
@@ -126,17 +138,18 @@ $('subscription-status').textContent=cloud?(cloud.activation_review_required?'�
 const frameMeter=sub.metering==='frames';
 $('billing-period').textContent=sub.billing==='calendar_month'?`本期（北京时间）：${new Date(sub.period_starts_at*1000).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})} — ${new Date(sub.period_ends_at*1000).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'})} · 本月额度 ${(frameMeter?sub.frame_limit:sub.command_limit)?.toLocaleString()??'—'} ${frameMeter?'帧（成功新感知）':'次（旧命令口径）'} · 不结转；提前续费不刷新当月额度。`:'';
 $('checked-at').textContent=s.cloud_checked_at?'最近核对：'+date(s.cloud_checked_at)+' · 权益以云端最新状态为准':'点击刷新账号状态以读取云端权益。';
-for(const [id,done] of [['step-account',active],['step-key',ready],['step-connect',c.status==='connected']])$(id).classList.toggle('done',done);
-$('step-account-text').textContent=active?'订阅有效，查看账号页了解剩余额度':'购买激活码后，在账号页激活';$('step-key-text').textContent=ready?'本机已准备好，连接浏览器后开始任务':'点击准备本机使用，完成连接配置';
+const deviceReview=s.onboarding?.stage==='review_device_connection';
+for(const [id,done] of [['step-account',active],['step-key',ready&&!deviceReview],['step-connect',c.status==='connected']])$(id).classList.toggle('done',done);
+$('step-account-text').textContent=active?'订阅有效，查看账号页了解剩余额度':'购买激活码后，在账号页激活';$('step-key-text').textContent=deviceReview?'设备连接待核对，请到连接诊断查看':ready?'本机已准备好，连接浏览器后开始任务':'点击准备本机使用，完成连接配置';
 renderConnectionRepair();
 $('error-detail').textContent=c.first_error?JSON.stringify(c.first_error,null,2):c.status==='cleanup_unknown'?'浏览器退出未确认。请保留会话目录并核查原进程。':'暂无连接错误';
 if(s.notice)say(messages[s.notice]||'状态需要核对：'+s.notice,true);choose(view);}
-async function readState(){state=await request('state');render();}
+async function readState(){state=await request('state');render();updateConnectionFeedback();}
 async function act(op,body={}){if(busy)return;let activated=false;busy=true;if(op==='support_export'){supportReport=null;$('support-preview').value='';$('support-preview').hidden=true;}render();say('正在处理…');try{let value=await request(op,body);if(op==='redeem'){activated=true;value={...value,preparation:await request('prepare',{})};}if(op==='login'||op==='register')reauth=false,closing=false;await readState();if(['terms_accept','register','login','key_create','key_rotate','key_revoke','device_enroll','device_rotate','device_enable','device_revoke','acknowledge','email_verify','email_code_verify','appeals','appeal_create','redeem','prepare','activation_receipts'].includes(op)&&state.signed_in){await request('refresh',{});await readState();}
 if(op==='redeem'){const p=value.preparation;say(p.status==='prepared'?'激活成功，本机已准备好。连接浏览器后即可按额度使用。':'激活已确认；'+(guideStages[p.stage]?.[1]||'本机准备尚未完成，请核对当前状态。'));choose(p.status==='prepared'?'overview':(guideStages[p.stage]?.[3]==='diagnostics'?'diagnostics':'account'));}
 else if(op==='prepare'){say(value.status==='prepared'?'本机已准备好，可以连接浏览器。':guideStages[value.stage]?.[1]||'本机准备尚未完成，请核对当前状态。');if(value.status!=='prepared'&&guideStages[value.stage]?.[3]==='diagnostics')choose('diagnostics');}
 else if(op==='activation_receipts'){activationReceipts=value;$('activation-receipts-list').replaceChildren();for(const r of value.receipts){const li=document.createElement('li');li.textContent=`${date(r.redeemed_at)} · 套餐 ${r.plan_id} · ${r.months} 个月 · 每月 ${r.frames.toLocaleString()} 帧 · 请求号 ${r.request_id}`;$('activation-receipts-list').append(li);}$('activation-receipt-status').textContent=value.pending_confirmed?'已找到待核对请求的激活回执。确认记录后可解除核对提示，再准备本机使用。':value.receipts.length?'已读取激活记录。未匹配的请求仍需核对，不能据此认定未生效。':'暂无激活回执；请求仍可能在处理中，请稍后查询或联系运营。';say('已查询激活记录，未重复提交激活码。');}
-else if(op==='check'||op==='diagnose'){const names={status:'检查结果',mode:'检查范围',api_config:'API 配置',device_config:'设备配置',chrome:'Chrome',api_health_ok:'API 认证',connector_tls_verified:'连接器 TLS',device_authentication:'设备认证',browser_started:'启动浏览器',error:'诊断代码'};const translations={checked:'通过',failed:'未通过',valid:'有效',found:'已找到',offline:'本机检查',online:'网络检查',not_tested:'未测试',true:'是',false:'否'};const dl=$('diagnostic-result');dl.replaceChildren();for(const [k,label] of Object.entries(names)){if(!(k in value))continue;const div=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=translations[String(value[k])]||String(value[k]);div.append(dt,dd);dl.append(div);}say(value.status==='checked'?'检查完成。':'检查发现问题，请查看结果。',value.status!=='checked');}
+else if(op==='check'||op==='diagnose'){const names={status:'检查结果',mode:'检查范围',api_config:'API 配置',device_config:'设备配置',chrome:'Chrome',api_health_ok:'API 认证',connector_tls_verified:'连接器 TLS',device_authentication:'设备认证',browser_started:'启动浏览器',error:'诊断代码'};const translations={checked:'通过',failed:'未通过',valid:'有效',found:'已找到',offline:'本机检查',online:'网络检查',not_tested:'未测试',true:'是',false:'否'};const dl=$('diagnostic-result');dl.replaceChildren();for(const [k,label] of Object.entries(names)){if(!(k in value))continue;const div=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=translations[String(value[k])]||String(value[k]);div.append(dt,dd);dl.append(div);}say(value.status==='checked'?(op==='check'?'本机检查完成。':'网络检查完成。')+'设备认证仍需实际连接验证。':'检查发现问题，请查看结果。',value.status!=='checked');}
 else if(op==='support_export'){supportReport=value.report;$('support-preview').value=JSON.stringify(value.report,null,2);$('support-preview').hidden=false;say('诊断摘要已生成，请检查后下载。');}
 else if(op==='appeals'||op==='appeal_create'){
 if(!state.signed_in||state.account!==exportAccount){appealHistory=null;say('账号已变化，请重新查询本人申诉。',true);}
@@ -160,7 +173,10 @@ else if(op==='recovery_manual_request')say('已受理审核指定新邮箱的验
 else if(op==='recovery_manual_confirm'){reauth=true;authMode('login');say('人工恢复完成。旧登录与Key已失效，订阅已暂停。请重新登录并联系运营核对设备和权益后启用，不会自动补额。');}
 else if(op==='email_verify')say('邮箱已验证，可用于找回密码。');
 else if(op==='recovery_reset'){reauth=true;authMode('login');say('密码已重设，旧登录已注销。请使用新密码登录。');}
-else say(op==='connect'?'正在启动专属浏览器，请等待连接状态更新。':op==='disconnect'?'已请求停止，请核对连接状态。':op==='password'?'密码已修改，请重新登录。':'已完成。');
+else if(op==='connect'){say('正在启动专属浏览器，请等待连接状态更新。');awaitingConnectionFeedback=true;updateConnectionFeedback();}
+else if(op==='key_rotate'&&state.onboarding?.stage==='review_device_connection'){say('本机连接配置已换发。设备连接仍需核对：'+guideStages.review_device_connection[1],true);choose('diagnostics');}
+else if(op==='device_rotate')say('设备凭据已换发，旧端设备凭据已失效。请手动连接浏览器验证；换发成功不代表设备已连接。');
+else say(op==='disconnect'?'已请求停止，请核对连接状态。':op==='password'?'密码已修改，请重新登录。':'已完成。');
 }catch(e){say((activated?'激活已确认，本机准备尚未完成。':'')+errorMessage(e),true);if(e.code==='account_login_required'){reauth=true;}try{await readState();}catch(_){}}
 finally{busy=false;render();}}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>choose(b.dataset.view));

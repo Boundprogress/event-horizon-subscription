@@ -118,6 +118,14 @@ def terms_document():
         return {'available': False, 'error': 'terms_document_unavailable'}
 
 
+def device_connection_rejected(connection):
+
+    first = connection.get('first_error')
+    return (connection.get('clean') is True and connection.get('running') is False
+            and connection.get('status') == 'failed' and isinstance(first, dict)
+            and first.get('reason') == 'hub_rejected_connection' and first.get('phase') == 'hello')
+
+
 def onboarding(state, now=None):
     
     now = time.time() if now is None else now
@@ -144,6 +152,7 @@ def onboarding(state, now=None):
         elif device.get('enabled') is not True: stage = 'enable_device'
         elif c.get('status') == 'connected' and c.get('running'): stage = 'agent'
         elif c.get('running') or c.get('status') == 'starting': stage = 'connecting'
+        elif device_connection_rejected(c): stage = 'review_device_connection'
         else: stage = 'connect'
     return {'stage': stage, 'host_connection': 'not_verified', 'automatic_actions': False}
 
@@ -593,6 +602,14 @@ class Console:
         if c.get('browser_cleanup') in CLEAN | {'unknown'}: connection['browser_cleanup'] = c['browser_cleanup']
         connection['has_error'] = bool(c.get('first_error') or c.get('error'))
 
+
+        first = c.get('first_error')
+        if isinstance(first, dict):
+            labels = {key: first[key] for key, allowed in
+                      (('reason', {'hub_rejected_connection'}), ('phase', {'hello'}))
+                      if isinstance(first.get(key), str) and first[key] in allowed}
+            if labels: connection['first_error'] = labels
+
         report = {'schema': 'eh-support/1', 'generated_at': time.time(),
                   'version': self.snapshot()['version'], 'platform': sys.platform,
                   'signed_in': bool(d.get('login_file')),
@@ -690,7 +707,11 @@ class Console:
                 aid=text(v.get('account'));name=text(v.get('username'));token=text(v.get('token'),512)
                 if not token.startswith('ehs_'):raise PanelError('invalid_remote_response')
                 filename=self.store.save_credential(self.setup.api_config(dict(cfg,token=token)))
-                if d.get('account')!=aid:d.update(key_file=None,key_id=None,device_file=None)
+                if d.get('account')!=aid:
+                    d.update(key_file=None,key_id=None,device_file=None)
+
+                    if (d.get('connection') or {}).get('clean') is True:
+                        d['connection']=None
                 d.update(account=aid,username=name,login_file=filename);self.cloud=None;self.cloud_at=None;self.last_diagnostic=None
                 self.email_code_flow=None;self.recovery_code_flow=None
                 if op == 'register': outcome['email_verification_required'] = v.get('email_verification_required') is True
@@ -753,6 +774,9 @@ class Console:
                 cfg=sibling('connector').validate_config(v.get('device_config'))
 
                 d['device_file']=self.store.save_credential(cfg)
+                previous = d.get('connection') or {}
+                if previous.get('clean') is True and not previous.get('running') and previous.get('status') == 'failed':
+                    d['connection']=None
                 self.notice=None if v.get('hub_applied') is True else 'device_waiting_for_hub'
             elif op=='key_revoke':
                 fields(body,{'key_id'});text(body['key_id'])
