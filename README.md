@@ -23,6 +23,9 @@ EH 将网页中可见的内容和操作目标整理成结构化信息，再把�
 准备 Python 3.10+、Chrome，以及能访问本机文件、加载 MCP 工具的 Agent。
 
 ```sh
+git clone https://github.com/Boundprogress/event-horizon-subscription.git
+cd event-horizon-subscription
+
 python3 -I -S -B eh.py start
 ```
 
