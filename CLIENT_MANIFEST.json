@@ -1,0 +1,113 @@
+{
+  "client_only": true,
+  "files": {
+    ".gitignore": {
+      "bytes": 208,
+      "sha256": "7204bdf4e34a861b93e8dd14e2c12015933d9043498fc3151f4f4e9ba96e4d1b"
+    },
+    "LICENSE": {
+      "bytes": 34523,
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0"
+    },
+    "NOTICE": {
+      "bytes": 707,
+      "sha256": "1af87ef026ff5bde84b061f9607c77cd8320ca92da1e73a55254a6d0b2828237"
+    },
+    "README.md": {
+      "bytes": 4297,
+      "sha256": "7a24edae4740b8fb5fc07fea074707ce0faf40d2012df365043b4f833da20406"
+    },
+    "VERSION": {
+      "bytes": 22,
+      "sha256": "18df3810be05d341abc9df2aee5ddaaf52631c97c0e7e31e969a52d189f5e501"
+    },
+    "account.py": {
+      "bytes": 12717,
+      "sha256": "28cd5ad8215da717d5c51341414827d35fba5dec7ca22d51c18f599aa1eb3b0e"
+    },
+    "browser.py": {
+      "bytes": 16201,
+      "sha256": "6e2f7e77a8124b46c88e0e27b071af133ca91ed496ed38080052fd8850c1c968"
+    },
+    "client.py": {
+      "bytes": 60205,
+      "sha256": "d4e81a796c4e8f9c375348f6066395c3091bf6ed8b64a347293e85df8c91ff74"
+    },
+    "connector.py": {
+      "bytes": 63899,
+      "sha256": "bd73d1a4d53e88b49e63f8b8a54987feeae4007f686a41d49777b877757f9aba"
+    },
+    "docs/CAPABILITIES.md": {
+      "bytes": 3941,
+      "sha256": "f066f4135b457a2b08130c2a97c3b2d6eb4941054c614fe5435a1ecbe29c8665"
+    },
+    "docs/DEMO_EVIDENCE.md": {
+      "bytes": 5396,
+      "sha256": "b926a5a3671ae27deb89069d4d519099036a77b9a5f69968783b5a0e43d45ee1"
+    },
+    "docs/FAQ.md": {
+      "bytes": 3783,
+      "sha256": "756faffab2f046467eb814629ae74bb0e2b4d01da4287014ebab1cec00a60072"
+    },
+    "docs/README.md": {
+      "bytes": 238,
+      "sha256": "ec3a6e54abdd24e0511ca0b9b7e6f1706804ac2fbec518e4d8efbcaf9e088fb1"
+    },
+    "eh.py": {
+      "bytes": 5518,
+      "sha256": "cfd8a88c9e59e6c2942aa6762c6a7ef1633e3d1937b25846d8e1b2b7bbd22046"
+    },
+    "example_agent.py": {
+      "bytes": 141875,
+      "sha256": "57f3d1026a4b6f9715d254820df1b63cd05c7d6f1d26ecb9db1fc8aef0ce9178"
+    },
+    "panel.css": {
+      "bytes": 13527,
+      "sha256": "e34b01baae43e34a45f74ffd3a9962b982aa8dfc929bee8a4605f65ede63e423"
+    },
+    "panel.html": {
+      "bytes": 18964,
+      "sha256": "e850e972f766605de04eb28b39de9e7b397bd899fe6e089ba5c72d7a6a0f7ed5"
+    },
+    "panel.js": {
+      "bytes": 45496,
+      "sha256": "4d3860fcaddbee33a2f2d1641b4e798a3d4992edf646c5a0074ffa6e596395b6"
+    },
+    "panel.py": {
+      "bytes": 60578,
+      "sha256": "8a49d8cfba7a78ede6e20ad79a1ac1fcae414664be93fa6007104fe4f8784e37"
+    },
+    "sensitive_domains.json": {
+      "bytes": 2032,
+      "sha256": "f2d87fb601a864a9b2679381be3bec374dbddb53a3ef2ab17e0c89574a82e02c"
+    },
+    "setup.py": {
+      "bytes": 23081,
+      "sha256": "65dc7d89da47da1fea16a6cf1f404f96304c928ebeb1d23c4442ebaf315e6b85"
+    },
+    "skills/eh-subscription-browser/SKILL.md": {
+      "bytes": 29860,
+      "sha256": "ed4b28250f2344e9cf545b942f91fae75ce7264d2edbd0e4be494691ea14ad97"
+    },
+    "terms.html": {
+      "bytes": 9285,
+      "sha256": "42e59d173f7ce9354a1fd484f3a39332b8bad927f26a366f8536bd97eeaac50c"
+    },
+    "tls_channel.py": {
+      "bytes": 38095,
+      "sha256": "5ea9f8f65df34e22f5c86470411fc1e6b7ad1b0d0c5b91a83756972e1b12525c"
+    },
+    "win_platform.py": {
+      "bytes": 12105,
+      "sha256": "d2f5275b5c9a18b45518dde7b2bf8a910b0129b4f5e6ef34b345cfa7ebf0b3cb"
+    },
+    "赠送激活码-20个.txt": {
+      "bytes": 1383,
+      "sha256": "66c6131405cc4676bd0bbd040822542c517df2728d20efbfbcd77f22957f4998"
+    }
+  },
+  "integrity_only": true,
+  "publisher_authentication": false,
+  "schema": "eh-client-source/1",
+  "version": "0.25.3-lab.20261103.1"
+}
