@@ -15,11 +15,11 @@
     },
     "README.md": {
       "bytes": 4402,
-      "sha256": "c642cfef5c81c5f46d0bd6689f65f63f97b2cc1348f5cfb234619d006d9d3c3b"
+      "sha256": "12f93106ab88e08106735c4a59f86f7498830a5598a69c248302909a0e766c3d"
     },
     "VERSION": {
       "bytes": 22,
-      "sha256": "0391eb1b6c6ed659e61c6a88e619f670d3e58e96a6a9e6544bc6c85082e05606"
+      "sha256": "3756ded81978faf3435e8f9fb21e2c4c0f9a47ba2f03abf0c334d90b3248a49b"
     },
     "account.py": {
       "bytes": 12717,
@@ -46,8 +46,8 @@
       "sha256": "b926a5a3671ae27deb89069d4d519099036a77b9a5f69968783b5a0e43d45ee1"
     },
     "docs/FAQ.md": {
-      "bytes": 6414,
-      "sha256": "6f243a5b0873d0f9ed397bd16709574e2400a51f4f937cef6f34b3ed6ff9ea82"
+      "bytes": 7104,
+      "sha256": "324dc4cc376617c85a7cbaee2f2aa40ba04213b6d39c0e6adc655395f0206ce1"
     },
     "docs/README.md": {
       "bytes": 238,
@@ -70,12 +70,12 @@
       "sha256": "b4b15d11d9b3baa51aaaaa4ccbd3cdcfe5fe166edaa2afef8aa8e439c2f8b6aa"
     },
     "panel.js": {
-      "bytes": 49343,
-      "sha256": "61acc26ca383bd8c017e154c10fae7d8e3b3d01de8744d8bfb95ab5e1e2533ed"
+      "bytes": 51251,
+      "sha256": "0abdd6cd34cf185e948143e17dd5ceba255ae18a0c5051b3f946c3904c3cb108"
     },
     "panel.py": {
-      "bytes": 66236,
-      "sha256": "619607f95e7e7ea4d859ac75be41692de0c727be01848dc7e4500c8742f000f5"
+      "bytes": 67361,
+      "sha256": "8b0d96aa49023b9819d9363e833aeccedd9cf4019ea2538efb9b8dc71bd0ac2f"
     },
     "sensitive_domains.json": {
       "bytes": 2032,
@@ -101,6 +101,14 @@
       "bytes": 3784,
       "sha256": "e28bf6ea5eff8a5d9378388a8d67748b22b6b1a384d5e61e17ee59699094177d"
     },
+    "tests/test_console_exit.py": {
+      "bytes": 11119,
+      "sha256": "6c1a71a50069f4f50444a47263e5e3e4a6de0419144f6bc1594d4d36d14f311d"
+    },
+    "tests/test_panel_exit_ui.js": {
+      "bytes": 7396,
+      "sha256": "cffff87a0d0549bcbaa39bcc6144bfad9c7e79080c171b303172ebd2842ea7cb"
+    },
     "tests/test_panel_recovery.py": {
       "bytes": 7713,
       "sha256": "39387e719324eb1d825db5f85291a965a4115c1394f04ab7ad65ddd9e8c5f3ca"
@@ -121,5 +129,5 @@
   "integrity_only": true,
   "publisher_authentication": false,
   "schema": "eh-client-source/1",
-  "version": "0.25.6-lab.20261104.1"
+  "version": "0.25.7-lab.20261104.1"
 }

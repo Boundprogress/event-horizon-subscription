@@ -13,7 +13,7 @@ Object.assign(messages,{activation_code_invalid_or_unavailable:'激活码无效�
 Object.assign(messages,{email_code_invalid_or_expired:'验证码不正确、已过期或已使用。请核对6位数字，或点击重新申请。',email_already_registered:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_in_use:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_unavailable:'该邮箱暂不可用于注册，请使用账号找回或换一个邮箱。',email_required:'注册时请填写邮箱，并在注册后完成邮箱验证。',email_not_pending:'当前没有待验证的注册邮箱，请刷新账号状态。',recovery_response_unknown_restart:'找回响应未确认，原操作可能已生效；不会自动重试。请尝试新密码登录，或点击重新申请验证码。',email_response_unknown_restart:'邮箱验证响应未确认，原操作可能已生效；不会自动重试。请刷新邮箱状态，未验证时可明确重新发送验证码。'});
 Object.assign(messages,{appeal_request_conflict:'该申诉请求号已用于不同内容，请查询原申诉。',appeal_pending_exists:'已有待处理申诉，请查询处理状态。',appeal_not_eligible:'账号当前没有受限审核标记，请刷新状态；未激活或到期请按激活/续期流程处理。',appeal_state_changed:'账号或申诉状态已变化，请重新查询。',invalid_appeal_reason:'请填写1–1000字申诉说明，勿包含密码、验证码、Key、凭据或网页任务正文。',appeals_service_update_required:'当前控制台或服务端尚未支持站内申诉，请更新客户端并联系运营。现有状态查询和账号功能可继续使用。',appeal_rate_limited:'申诉提交过于频繁，请等待现有处理或稍后再试。',appeal_query_required:'请先按原请求号查到本人申诉，再解除本机核对提示。'});
 function errorMessage(e){return messages[e.code]||('操作未完成：'+(e.code||'connection_to_console_failed'));}
-async function request(path,body){let result;try{result=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+capability,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',credentials:'omit',redirect:'error'});}catch(_){throw {code:'response_unknown_check_remote_state'};}
+async function request(path,body,signal){let result;try{result=await fetch('/api/'+path,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+capability,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',credentials:'omit',redirect:'error',signal});}catch(_){throw {code:'response_unknown_check_remote_state'};}
 let value;try{value=await result.json();}catch(_){throw {code:'response_unknown_check_remote_state'};}
 if(!result.ok)throw {code:value.error||'request_failed'};return value;}
 function choose(name){if(view!==name){$('main-content').scrollTop=0;window.scrollTo({top:0});}view=Object.hasOwn(titles,name)?name:'overview';name=view;document.querySelectorAll('[data-page]').forEach(x=>x.hidden=x.dataset.page!==name);document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.view===name));$('view-title').textContent=titles[name];}
@@ -92,7 +92,7 @@ function updateConnectionFeedback(){if(!awaitingConnectionFeedback)return;const 
  if(c.status==='connected')say('专属浏览器已连接，可以让 Agent 发起任务。');
  else if(['failed','stopped','cleanup_unknown'].includes(c.status))say('连接未成功。'+connectionFailureMessage(),true);
 }
-function render(){if(!state)return;const scope=currentAgentScope();if(scope!==agentScope){clearAgentLink();agentScope=scope;}const identity=state.signed_in?state.account:null;if(identity!==displayAccount){clearAccountViews();displayAccount=identity;}renderUpdates();renderOnboarding();renderAppeals();const s=state,cloud=s.cloud,c=s.connection||{},running=c.running===true||c.status==='starting'||c.status==='connected',ready=s.credentials.api_ready&&s.credentials.device_ready;
+function render(){if(!state||closing)return;const scope=currentAgentScope();if(scope!==agentScope){clearAgentLink();agentScope=scope;}const identity=state.signed_in?state.account:null;if(identity!==displayAccount){clearAccountViews();displayAccount=identity;}renderUpdates();renderOnboarding();renderAppeals();const s=state,cloud=s.cloud,c=s.connection||{},running=c.running===true||c.status==='starting'||c.status==='connected',ready=s.credentials.api_ready&&s.credentials.device_ready;
 $('auth').hidden=s.signed_in&&!reauth;$('recovery').hidden=s.signed_in&&!reauth;$('workspace').hidden=!s.signed_in||reauth;$('endpoint').textContent=s.endpoint;$('auth-endpoint').textContent=s.endpoint;$('version').textContent='EH / '+s.version;
 $('username').textContent=s.username||'账号';
 $('pending').hidden=!s.pending;if(s.pending)$('pending-text').textContent=s.pending.operation==='redeem'?`激活结果尚未确认（请求号 ${s.pending.request_id}）。请到“购买与激活”查询激活记录，核对后再继续；不要重复提交激活码。`:`操作 ${s.pending.operation} 尚未确认（${date(s.pending.started_at)}）。可先刷新账号状态，核对 Key / 设备是否已经生效。登记或换发的凭据若未保存，需明确换发；请勿直接重复原操作。`;
@@ -146,7 +146,7 @@ renderConnectionRepair();
 const errorDetail={...(c.first_error?{first_error:c.first_error}:{}),...(c.browser_cleanup_diagnostic?{browser_cleanup_diagnostic:c.browser_cleanup_diagnostic}:{})};
 $('error-detail').textContent=Object.keys(errorDetail).length?JSON.stringify(errorDetail,null,2):c.status==='cleanup_unknown'?'浏览器退出未确认。请点击核实退出并恢复连接，保留原数据目录。':'暂无连接错误';
 if(s.notice&&s.notice!==displayedNotice)say(messages[s.notice]||'状态需要核对：'+s.notice,true);displayedNotice=s.notice||null;choose(view);}
-async function readState(){state=await request('state');render();updateConnectionFeedback();}
+async function readState(){const next=await request('state');if(closing)return;state=next;render();updateConnectionFeedback();}
 async function act(op,body={}){if(busy)return;let activated=false;busy=true;if(op==='support_export'){supportReport=null;$('support-preview').value='';$('support-preview').hidden=true;}render();say('正在处理…');try{let value=await request(op,body);if(op==='redeem'){activated=true;value={...value,preparation:await request('prepare',{})};}if(op==='login'||op==='register')reauth=false,closing=false;await readState();if(['terms_accept','register','login','key_create','key_rotate','key_revoke','device_enroll','device_rotate','device_enable','device_revoke','acknowledge','email_verify','email_code_verify','appeals','appeal_create','redeem','prepare','activation_receipts'].includes(op)&&state.signed_in){await request('refresh',{});await readState();}
 if(op==='redeem'){const p=value.preparation;say(p.status==='prepared'?'激活成功，本机已准备好。连接浏览器后即可按额度使用。':'激活已确认；'+(guideStages[p.stage]?.[1]||'本机准备尚未完成，请核对当前状态。'));choose(p.status==='prepared'?'overview':(guideStages[p.stage]?.[3]==='diagnostics'?'diagnostics':'account'));}
 else if(op==='prepare'){say(value.status==='prepared'?'本机已准备好，可以连接浏览器。':guideStages[value.stage]?.[1]||'本机准备尚未完成，请核对当前状态。');if(value.status!=='prepared'&&guideStages[value.stage]?.[3]==='diagnostics')choose('diagnostics');}
@@ -193,9 +193,44 @@ $('activation-receipts').onclick=()=>act('activation_receipts');
 for(const op of ['refresh','prepare','connect','disconnect','check','diagnose','recover_browser'])$(op).onclick=()=>act(op);
 $('logout').onclick=()=>act('logout');$('relogin').onclick=()=>{reauth=true;authMode('login');render();};
 $('acknowledge').onclick=()=>{if(state?.pending&&confirm(state.pending.operation==='appeal_create'?'已按原请求号查到本人申诉并核对处理状态？此操作只解除本机核对提示，不会重新提交或自动解封。':state.pending.operation==='redeem'?'已经核对激活回执和账号权益？此操作仅解除本机核对提示，不重复兑换；仍不确定时请先查询或联系运营。':'已经核对远端 Key / 设备状态，并了解未保存的凭据需要撤销或换发？此操作仅解除本机阻止，不重试原请求。'))act('acknowledge',{operation_id:state.pending.id,reviewed:true});};
-if(!capability){say('请运行客户端启动器，从它打开的页面进入控制台。',true);}else{readState().catch(e=>say(errorMessage(e),true));setInterval(()=>{if(!busy&&!closing)readState().catch(e=>{if(e.code!=='operation_in_progress')say(errorMessage(e),true);});},2500);}
+if(!capability){say('请运行客户端启动器，从它打开的页面进入控制台。',true);}else{readState().catch(e=>{if(!closing)say(errorMessage(e),true);});setInterval(()=>{if(!busy&&!closing)readState().catch(e=>{if(!closing&&e.code!=='operation_in_progress')say(errorMessage(e),true);});},2500);}
 
-$('quit').onclick=async()=>{if(busy||closing)return;if(!confirm('退出会断开专属浏览器连接，账号凭据会保留。确认退出？'))return;try{await request('quit',{});closing=true;document.querySelectorAll('button').forEach(b=>b.disabled=true);say('正在退出并清理连接。完成后可重新打开客户端。');}catch(e){say(errorMessage(e),true);}};
+async function observeConsoleClosed(timeoutMs=10000,probeTimeoutMs=1000){
+ const deadline=Date.now()+timeoutMs;
+ while(Date.now()<deadline){
+  if(navigator.onLine===false)return false;
+  const controller=new AbortController();let timedOut=false;
+  const timer=setTimeout(()=>{timedOut=true;controller.abort();},Math.min(probeTimeoutMs,deadline-Date.now()));
+  try{
+   await fetch('/api/state',{method:'GET',headers:{Authorization:'Bearer '+capability},cache:'no-store',credentials:'omit',redirect:'error',signal:controller.signal});
+  }catch(error){
+   if(timedOut||controller.signal.aborted||error?.name!=='TypeError'||navigator.onLine===false)return false;
+   return Date.now()<deadline;
+  }finally{clearTimeout(timer);}
+  const remaining=deadline-Date.now();
+  if(remaining>0)await new Promise(resolve=>setTimeout(resolve,Math.min(250,remaining)));
+ }
+ return false;
+}
+async function quitClient(){
+ if(busy||closing)return;
+ if(!confirm('退出会断开专属浏览器连接，账号凭据会保留。确认退出？'))return;
+ closing=true;busy=true;document.querySelectorAll('button').forEach(b=>b.disabled=true);
+ say('正在退出并清理连接，请稍候…');
+ const unknown='退出结果尚未确认。请检查启动终端；若客户端已停止，可关闭本页后重新启动，并到连接诊断核实退出状态。';
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),65000);
+ try{
+  let receipt;
+  try{receipt=await request('quit',{},controller.signal);}finally{clearTimeout(timer);}
+  if(receipt?.status!=='shutdown_ready'||typeof receipt.connection_clean!=='boolean')throw {code:'invalid_shutdown_receipt'};
+  say('连接清理已结束，正在确认控制台关闭…');
+  if(!await observeConsoleClosed()){say(unknown,true);return;}
+  if(receipt.connection_clean)say('客户端已退出，可以关闭此页面或重新启动。账号和网页登录资料已保留。');
+  else say('控制台已关闭，但浏览器退出尚未确认。请重新启动客户端，在连接诊断中核实退出状态；原数据目录已保留。',true);
+ }catch(_){say(unknown,true);}
+ finally{clearTimeout(timer);busy=false;}
+}
+$('quit').onclick=quitClient;
 
 $('update-check').onclick=()=>{if(state?.updates?.status==='source_manual')return;return act('update_check');};
 $('update-apply').onclick=async()=>{if(busy||closing||state?.updates?.status==='source_manual')return;if(!confirm('下载并验证新版本，然后重启客户端？账号数据会保留。'))return;try{await request('update_apply',{});closing=true;document.querySelectorAll('button').forEach(b=>b.disabled=true);say('正在验证和安装更新。完成后会打开新的客户端页面；若未自动打开，请重新启动 EH Client。');}catch(e){say(errorMessage(e),true);}};

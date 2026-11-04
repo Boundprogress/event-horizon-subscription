@@ -378,6 +378,7 @@ class Console:
         self.email_code_flow=None;self.recovery_code_flow=None
         self.appeal_confirmation=None
         self.lock=threading.Lock();self.connection=Connection(self.setup);self.cloud=None;self.cloud_at=None;self.notice=None;self.quit_requested=False;self.update_requested=False;self.updates=updates or UpdateBridge()
+        self.shutdown_result=None;self.shutdown_reply_pending=False
         if store.data.get('connection') and not store.data['connection'].get('clean'):
             self.notice='previous_connection_unconfirmed'
 
@@ -921,7 +922,19 @@ class Console:
             if self.updates.snapshot().get('status')!='available':raise PanelError('check_update_first')
             self.update_requested=True;self.quit_requested=True;return {'status':'updating'}
         if op=='quit':
-            fields(body,set());self.quit_requested=True;return {'status':'closing'}
+            fields(body,set())
+            # dispatch already holds the console lock. Complete cleanup before
+            # issuing a receipt, without recursively acquiring it via close().
+            try:
+                self.connection.stop()
+                cleanup=self.sync_connection()
+            except Exception:
+                cleanup={'status':'cleanup_unknown','clean':False}
+            clean=cleanup.get('clean') is True and cleanup.get('running') is not True
+            self.shutdown_result=dict(cleanup,clean=clean)
+            self.shutdown_reply_pending=True
+            self.quit_requested=True
+            return {'status':'shutdown_ready','connection_clean':clean}
         if op=='refresh':fields(body,set());return self.refresh()
         if op=='activation_receipts':fields(body,set());return self.activation_receipts()
         if op=='prepare':fields(body,set());return self.prepare()
@@ -969,6 +982,7 @@ class Console:
     def close(self):
         self.email_code_flow=None;self.recovery_code_flow=None
         with self.lock:
+            if self.shutdown_result is not None:return self.shutdown_result
             self.connection.stop();return self.sync_connection()
 
 
@@ -1035,8 +1049,15 @@ class handler(BaseHTTPRequestHandler):
             except Exception:raise PanelError('invalid_json',400) from None
             app=self.server.app
             if not app.lock.acquire(blocking=False):raise PanelError('operation_in_progress',409)
-            try:self.reply(200,app.safe_json(app.dispatch(self.path[5:],body)))
-            finally:app.lock.release()
+            try:
+                self.reply(200,app.safe_json(app.dispatch(self.path[5:],body)))
+                self.wfile.flush()
+            finally:
+                # Even a disconnected caller must not leave a completed quit
+                # waiting forever. The UI treats a lost receipt as unconfirmed.
+                if self.path=='/api/quit' and app.quit_requested:
+                    app.shutdown_reply_pending=False
+                app.lock.release()
         except PanelError as exc:self.error(exc.code,exc.status)
         except (BrokenPipeError,ConnectionError,socket.timeout):pass
         except Exception:self.error('local_operation_failed_check_state',500)
@@ -1060,7 +1081,7 @@ def main(argv=None):
         print(json.dumps({'status':'console_ready','origin':server.origin,'launch_file':str(store.root/'launch.json')}),flush=True)
         for sig in ((signal.SIGINT,signal.SIGTERM) if win else (signal.SIGINT,signal.SIGTERM,signal.SIGHUP)):old[sig]=signal.signal(sig,lambda *_:done.set())
         if not args.no_open:webbrowser.open(launch['url'])
-        while not done.is_set() and not app.quit_requested:server.handle_request()
+        while not done.is_set() and (not app.quit_requested or app.shutdown_reply_pending):server.handle_request()
     except PanelError as exc:print(json.dumps({'error':exc.code}));exit_code=2
     except Exception:print(json.dumps({'error':'console_failed'}));exit_code=2
     finally:
