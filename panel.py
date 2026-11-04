@@ -48,7 +48,7 @@ AGENT_CONNECT_ERRORS = {'agent_connect_account_required', 'agent_connect_credent
     'unsupported_agent_host', 'installer_metadata_incomplete'}
 ERRORS = {'email_not_verified','email_unchanged','account_recovery_requires_quiet','email_service_unavailable','email_queue_busy','email_rate_limited','invalid_email','email_proof_invalid_or_expired','email_already_verified','invalid_login','account_auth_rate_limited','session_not_found','request_not_found','forbidden','unauthorized','active_key_exists_rotate_required','active_key_changed_refresh_required','subscription_disabled','subscription_quota','subscription_not_started','invalid_credentials','username_taken','registration_closed','account_login_required','subscription_inactive','subscription_expired','quota_exhausted','api_key_limit','key_not_found','device_already_registered_rotate_if_credential_lost','device_not_registered','password_requires_12_to_128_characters','invalid_username','invalid_identifier','password_verification_busy','account_session_limit','wrong_password','password_changed','unknown_plan','account_disabled','invalid_password_encoding'}
 CLEAN = {'verified_snapshot_stopped', 'observed_after_cleanup_error', 'not_started'}
-ERRORS |= {'terms_required', 'terms_update_required', 'terms_document_unavailable', 'activation_code_invalid_or_unavailable', 'activation_request_conflict', 'activation_rate_limited', 'subscription_reactivation_review_required'}
+ERRORS |= {'terms_required', 'terms_update_required', 'terms_document_unavailable', 'activation_code_invalid_or_unavailable', 'activation_request_conflict', 'activation_rate_limited', 'subscription_reactivation_review_required', 'subscription_plan_conflict', 'lifetime_frame_limit_exceeded'}
 ERRORS |= {'email_code_invalid_or_expired', 'email_already_registered', 'email_in_use', 'email_unavailable', 'email_verification_required', 'email_required', 'email_not_pending'}
 ERRORS |= {'appeal_request_conflict','appeal_pending_exists','appeal_not_eligible','appeal_state_changed','appeal_rate_limited','invalid_appeal_reason','invalid_public_result'}
 
@@ -143,6 +143,14 @@ def device_connection_rejected(connection):
             and first.get('reason') == 'hub_rejected_connection' and first.get('phase') == 'hello')
 
 
+def lifetime_subscription(value):
+    """Recognize the explicit non-expiring frame contract, never a missing date."""
+    return (value.get('billing') == 'lifetime_frames' and value.get('metering') == 'frames'
+            and 'expires_at' in value and value['expires_at'] is None
+            and 'period_ends_at' in value and value['period_ends_at'] is None
+            and type(value.get('frame_limit')) is int and value['frame_limit'] > 0)
+
+
 def onboarding(state, now=None):
 
     now = time.time() if now is None else now
@@ -158,8 +166,8 @@ def onboarding(state, now=None):
         if cloud.get('terms', {}).get('current') is False: stage = 'terms'
         elif cloud.get('activation_review_required') is True: stage = 'activation_review'
         elif sub.get('enabled') is not True: stage = 'activation'
-        elif not isinstance(sub.get('expires_at'), (int, float)): stage = 'refresh'
-        elif sub['expires_at'] <= now: stage = 'expired'
+        elif not lifetime_subscription(sub) and not isinstance(sub.get('expires_at'), (int, float)): stage = 'refresh'
+        elif not lifetime_subscription(sub) and sub['expires_at'] <= now: stage = 'expired'
         elif type(sub.get('remaining')) is not int: stage = 'refresh'
         elif sub['remaining'] <= 0: stage = 'quota'
         elif not keys: stage = 'recover_key' if local['api_ready'] else 'create_key'
@@ -580,6 +588,9 @@ class Console:
         sub={k:v for k,v in policy.items() if k in {'enabled','expires_at','command_limit','max_sessions','max_commands','period_starts_at','period_ends_at','frame_limit','price_minor','unit_price_minor'} and type(v) in (bool,int,float,type(None))}
         if policy.get('billing') == 'calendar_month':
             sub.update(billing='calendar_month', billing_timezone='Asia/Shanghai')
+        elif policy.get('billing') == 'lifetime_frames':
+            if not lifetime_subscription(policy): raise PanelError('invalid_remote_response')
+            sub.update(billing='lifetime_frames')
         sub['metering'] = 'frames' if policy.get('metering') == 'frames' else 'commands'
         if policy.get('currency') == 'CNY': sub['currency'] = 'CNY'
         sub.update({k:v for k,v in usage.items() if k in {'admitted','reserved','finished','remaining','charged_frames','reserved_frames'} and type(v) is int})
@@ -614,9 +625,17 @@ class Console:
         result = {}
         for key in ('activation_id', 'request_id', 'plan_id'):
             result[key] = text(value.get(key), 128)
-        for key in ('months', 'frames'):
-            if type(value.get(key)) is not int or value[key] <= 0: raise PanelError('invalid_remote_response')
-            result[key] = value[key]
+        lifetime = value.get('billing') == 'lifetime_frames'
+        if type(value.get('frames')) is not int or value['frames'] <= 0: raise PanelError('invalid_remote_response')
+        if type(value.get('months')) is not int: raise PanelError('invalid_remote_response')
+        if lifetime:
+            if (value['months'] != 0 or value['plan_id'] != 'eh_lifetime'
+                    or type(value.get('total_frames')) is not int or value['total_frames'] != value['frames']):
+                raise PanelError('invalid_remote_response')
+            result.update(billing='lifetime_frames', total_frames=value['total_frames'])
+        elif value['months'] <= 0:
+            raise PanelError('invalid_remote_response')
+        result.update(months=value['months'], frames=value['frames'])
         stamp = value.get('redeemed_at')
         if type(stamp) not in (int, float) or not 0 < stamp < 1e12: raise PanelError('invalid_remote_response')
         result['redeemed_at'] = stamp

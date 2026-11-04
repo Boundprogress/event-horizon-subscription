@@ -14,12 +14,12 @@
       "sha256": "1af87ef026ff5bde84b061f9607c77cd8320ca92da1e73a55254a6d0b2828237"
     },
     "README.md": {
-      "bytes": 4402,
-      "sha256": "12f93106ab88e08106735c4a59f86f7498830a5598a69c248302909a0e766c3d"
+      "bytes": 4701,
+      "sha256": "ee1502101bcce03500527d5b873e4eb17212debf16ce1eedf63e3d1c9be7c1aa"
     },
     "VERSION": {
       "bytes": 22,
-      "sha256": "3756ded81978faf3435e8f9fb21e2c4c0f9a47ba2f03abf0c334d90b3248a49b"
+      "sha256": "23867378f7dc900db1e94de5bddc51b5eb4d1218350c2f854f96f3a7f33af80c"
     },
     "account.py": {
       "bytes": 12717,
@@ -46,8 +46,8 @@
       "sha256": "b926a5a3671ae27deb89069d4d519099036a77b9a5f69968783b5a0e43d45ee1"
     },
     "docs/FAQ.md": {
-      "bytes": 7104,
-      "sha256": "324dc4cc376617c85a7cbaee2f2aa40ba04213b6d39c0e6adc655395f0206ce1"
+      "bytes": 7839,
+      "sha256": "235be88404a0f9c6d2ab904c445e8601b25bf9314af87de60f9c21343ad7bb22"
     },
     "docs/README.md": {
       "bytes": 238,
@@ -58,24 +58,24 @@
       "sha256": "cfd8a88c9e59e6c2942aa6762c6a7ef1633e3d1937b25846d8e1b2b7bbd22046"
     },
     "example_agent.py": {
-      "bytes": 141875,
-      "sha256": "57f3d1026a4b6f9715d254820df1b63cd05c7d6f1d26ecb9db1fc8aef0ce9178"
+      "bytes": 142274,
+      "sha256": "0dbad9e275be932f78f2e2cbd241ada1a6a8d8a516f018610624931ed486a96a"
     },
     "panel.css": {
       "bytes": 14010,
       "sha256": "e94501aea8eecbdea3a148d47855ad626aab404f347dfba6b4f1801e9bd201e0"
     },
     "panel.html": {
-      "bytes": 19374,
-      "sha256": "b4b15d11d9b3baa51aaaaa4ccbd3cdcfe5fe166edaa2afef8aa8e439c2f8b6aa"
+      "bytes": 19588,
+      "sha256": "05f3548137577b116e9213654be70a72054b0116505b04c24894a0ee097d2281"
     },
     "panel.js": {
-      "bytes": 51251,
-      "sha256": "0abdd6cd34cf185e948143e17dd5ceba255ae18a0c5051b3f946c3904c3cb108"
+      "bytes": 52207,
+      "sha256": "cabd23e46f13c5482409dc0424df6be3e213bc0f9ea90cb3c0bfb7bd393d9cb2"
     },
     "panel.py": {
-      "bytes": 67361,
-      "sha256": "8b0d96aa49023b9819d9363e833aeccedd9cf4019ea2538efb9b8dc71bd0ac2f"
+      "bytes": 68738,
+      "sha256": "e1e03ecbc5952f5b7ae73f679f3324bf7f13d15dceca87d0b1f60e1ae02a37e1"
     },
     "sensitive_domains.json": {
       "bytes": 2032,
@@ -113,6 +113,14 @@
       "bytes": 7713,
       "sha256": "39387e719324eb1d825db5f85291a965a4115c1394f04ab7ad65ddd9e8c5f3ca"
     },
+    "tests/test_permanent_subscription.py": {
+      "bytes": 7188,
+      "sha256": "65377dba480367bca72d3251d6363d10f717bcfeeaf0f0c64938114327898f46"
+    },
+    "tests/test_permanent_ui.js": {
+      "bytes": 4581,
+      "sha256": "5b6abb6a6825aad4aa5d531867b90844c269c15263c5da6cc2ddd70279c6308a"
+    },
     "tls_channel.py": {
       "bytes": 38095,
       "sha256": "5ea9f8f65df34e22f5c86470411fc1e6b7ad1b0d0c5b91a83756972e1b12525c"
@@ -129,5 +137,5 @@
   "integrity_only": true,
   "publisher_authentication": false,
   "schema": "eh-client-source/1",
-  "version": "0.25.7-lab.20261104.1"
+  "version": "0.26.0-lab.20261104.1"
 }

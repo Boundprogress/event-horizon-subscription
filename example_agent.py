@@ -392,16 +392,23 @@ def subscription_quota(value):
         number = value.get(name)
         return type(number) in (int, float) and 0 <= number <= 2**53 - 1 and math.isfinite(number)
 
-    if not timestamp("expires_at"):
-        return unavailable
     period_fields = ("period_starts_at", "period_ends_at")
-    if any(name in value for name in period_fields):
+    lifetime = value.get('billing') == 'lifetime_frames'
+    if lifetime:
+        if (metering != 'frames' or 'expires_at' not in value or value['expires_at'] is not None
+                or 'period_ends_at' not in value or value['period_ends_at'] is not None
+                or not timestamp('period_starts_at')):
+            return unavailable
+    elif not timestamp("expires_at"):
+        return unavailable
+    elif any(name in value for name in period_fields):
         if (not all(timestamp(name) for name in period_fields)
                 or value["period_starts_at"] >= value["period_ends_at"]):
             return unavailable
     else:
         period_fields = ()
     names = ("metering", "unit", *counts, "enabled", "expires_at", "terminal_units", *period_fields)
+    if lifetime: names += ('billing',)
     return {"available": True, **{name: value[name] for name in names}}
 
 
@@ -1023,7 +1030,7 @@ def _agent_result(value, *, sessions=True):
         "connector_readiness": lambda v: _agent_record(v, ("available", "ready", "reason", "checked_at")),
         "subscription_quota": lambda v: _agent_record(v, (
             "available", "reason", "metering", "unit", "limit", "used", "reserved", "remaining", "enabled",
-            "expires_at", "terminal_units", "period_starts_at", "period_ends_at")),
+            "expires_at", "terminal_units", "period_starts_at", "period_ends_at", "billing")),
         "usage": lambda v: _agent_record(v, (
             "metering", "unit", "units", "frames", "charged_frames", "reserved_frames", "limit", "used", "remaining")),
     })
