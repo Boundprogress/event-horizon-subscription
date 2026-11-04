@@ -40,7 +40,7 @@ ASSETS = {'/': ('panel.html', 'text/html; charset=utf-8'), '/terms': ('terms.htm
 RECOVERY_OPS = {'email_request','email_verify','email_change_request','email_change_confirm','recovery_request','recovery_reset','recovery_manual_request','recovery_manual_confirm'}
 CODE_OPS = {'email_code_request', 'email_code_verify', 'recovery_code_request', 'recovery_code_verify', 'recovery_code_reset', 'recovery_cancel'}
 OPERATIONS = RECOVERY_OPS | {'redeem', 'prepare', 'activation_receipts', 'support_export', 'agent_export', 'update_check', 'update_apply', 'quit', 'register', 'login', 'logout', 'password', 'refresh', 'key_create', 'key_rotate', 'key_revoke', 'device_enroll', 'device_rotate', 'device_revoke', 'device_enable', 'check', 'diagnose', 'connect', 'disconnect', 'acknowledge'}
-OPERATIONS.update({'agent_connect', 'terms_accept'})
+OPERATIONS.update({'agent_connect', 'terms_accept', 'recover_browser'})
 OPERATIONS.update(CODE_OPS)
 OPERATIONS.update({'appeals', 'appeal_create', 'appeal_release_unknown'})
 AGENT_CONNECT_ERRORS = {'agent_connect_account_required', 'agent_connect_credentials_required',
@@ -109,6 +109,23 @@ def diagnostic_summary(value):
     code = value.get('api_http_status')
     if type(code) is int and 100 <= code <= 599: result['api_http_status'] = code
     return result
+
+
+def cleanup_summary(value):
+    if not isinstance(value, dict): return {}
+    allowed = {
+        'class': {'SetupError', 'TimeoutExpired', 'OSError', 'LauncherError', 'BrowserError'},
+        'reason': {'ownership_file_changed', 'profile_changed', 'browser_root_exited_before_stop',
+                   'browser_root_identity_changed', 'browser_tree_limit', 'process_observation_deadline',
+                   'process_observation_failed', 'process_observation_invalid', 'process_exit_not_proven',
+                   'browser_stop_unconfirmed', 'browser_descendants_unverified', 'ownership_check_failed',
+                   'cleanup_io_failed', 'process_identity_changed', 'launcher_cleanup_error',
+                   'profile_in_use', 'profile_in_use_or_unsafe_lock', 'profile_identity_changed',
+                   'profile_exit_not_verified', 'browser_recovery_state_changed',
+                   'browser_recovery_identity_unverified', 'unsafe_profile_directory', 'unsafe_profile_lock'},
+    }
+    return {key: value[key] for key, choices in allowed.items()
+            if isinstance(value.get(key), str) and value[key] in choices}
 
 
 def terms_document():
@@ -283,6 +300,8 @@ class Connection:
                     if v.get('status') in {'starting','connected','stopped','failed'}: safe['status']=v['status']
                     if v.get('browser_cleanup') in CLEAN|{'unknown'}: safe['browser_cleanup']=v['browser_cleanup']
                     if isinstance(v.get('first_error'),dict): safe['first_error']=self.setup.first_error_summary(v['first_error'])
+                    diagnostic = cleanup_summary(v.get('browser_cleanup_diagnostic'))
+                    if diagnostic: safe['browser_cleanup_diagnostic'] = diagnostic
                     if 'error' in v: safe['error']='connection_failed'
                     if safe:
                         with self.lock:self.last=safe
@@ -385,6 +404,40 @@ class Console:
         self.sync_connection()
         v=self.store.data.get('connection')
         if v and not v.get('clean'):raise PanelError('disconnect_or_review_previous_connection')
+
+    def recover_browser(self):
+        self.sync_connection()
+        previous = self.store.data.get('connection') or {}
+        if (previous.get('running') is True
+                or (self.connection.proc is not None and self.connection.proc.poll() is None)):
+            raise PanelError('browser_recovery_connection_running')
+        if previous.get('clean') is True:
+            return {'status': 'already_clean', 'connection': previous, 'automatic_reconnect': False}
+        self.store.check()
+        raw = previous.get('directory')
+        if not isinstance(raw, str): raise PanelError('browser_recovery_directory_unverified')
+        directory = Path(raw)
+        if (not directory.is_absolute() or directory.parent != self.store.root
+                or not re.fullmatch(r'browser-(?:[a-f0-9]{32}|account-[a-f0-9]{64})', directory.name)
+                or directory.is_symlink()):
+            raise PanelError('browser_recovery_directory_unverified')
+        browser = self.setup.sibling('browser')
+        try:
+            result = browser.reconcile_stopped(directory / 'ownership.json')
+        except (browser.BrowserError, OSError, ValueError):
+            raise PanelError('browser_recovery_unconfirmed') from None
+        if not isinstance(result, dict) or result.get('status') != 'stopped':
+            raise PanelError('browser_recovery_unconfirmed')
+        recovered = dict(previous, status='stopped', running=False, clean=True,
+                         browser_cleanup='verified_snapshot_stopped')
+        self.store.data['connection'] = recovered
+        try: self.store.commit()
+        except Exception:
+            self.store.data['connection'] = previous
+            raise
+        self.connection = Connection(self.setup)
+        self.notice = None
+        return {'status': 'recovered', 'connection': recovered, 'automatic_reconnect': False}
 
     def sync_connection(self):
         if self.connection.proc:
@@ -619,9 +672,15 @@ class Console:
         first = c.get('first_error')
         if isinstance(first, dict):
             labels = {key: first[key] for key, allowed in
-                      (('reason', {'hub_rejected_connection'}), ('phase', {'hello'}))
+                      (('reason', {'hub_rejected_connection', 'browser_ownership_lost', 'browser_not_running',
+                                   'browser_ownership_unverified', 'browser_ownership_changed',
+                                   'browser_profile_changed', 'browser_endpoint_changed', 'browser_lock_changed',
+                                   'invalid_browser_identity', 'invalid_browser_launch_args'}),
+                       ('phase', {'hello', 'lifecycle', 'ownership'}))
                       if isinstance(first.get(key), str) and first[key] in allowed}
             if labels: connection['first_error'] = labels
+        diagnostic = cleanup_summary(c.get('browser_cleanup_diagnostic'))
+        if diagnostic: connection['browser_cleanup_diagnostic'] = diagnostic
 
         report = {'schema': 'eh-support/1', 'generated_at': time.time(),
                   'version': self.snapshot()['version'], 'platform': sys.platform,
@@ -874,6 +933,7 @@ class Console:
             self.store.write('review-'+p['id']+'.json',dict(p,reviewed_at=time.time()))
             self.store.data['pending']=None;self.store.commit();return {'status':'review_recorded','automatic_retry':False}
         if op=='disconnect':fields(body,set());self.connection.stop();return {'connection':self.sync_connection()}
+        if op=='recover_browser':fields(body,set());return self.recover_browser()
         if op in {'check','diagnose','connect'}:
             fields(body,set());self.config('login');self.config('key');self.config('device')
             api=self.store.root/self.store.data['key_file'];device=self.store.root/self.store.data['device_file']

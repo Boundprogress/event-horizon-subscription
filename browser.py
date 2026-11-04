@@ -357,6 +357,83 @@ def _validate_reuse(root, profile):
     _assert_profile_idle(profile)
 
 
+def _recovery_process_table(deadline):
+    # Reuse the bounded, platform-specific observer without sending signals.
+    spec = importlib.util.spec_from_file_location("eh_browser_recovery_setup", Path(__file__).with_name("setup.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    try:
+        return module.process_table(deadline)
+    except (module.SetupError, OSError, ValueError, subprocess.TimeoutExpired):
+        raise BrowserError("profile_exit_not_verified") from None
+
+
+def reconcile_stopped(path, *, lease=None, expected=None):
+    """Prove an exited browser is idle before releasing its persistent profile."""
+    raw = _checked_path(path)
+    if raw.name != "ownership.json" or raw.parent.is_symlink():
+        raise BrowserError("unsafe_profile_directory")
+    root = raw.parent.resolve()
+    _private_directory(root)
+    own_lease = None
+    try:
+        if lease is None:
+            own_lease = lease = profile_lease(root)
+        if not isinstance(lease, ProfileLease):
+            raise BrowserError("invalid_profile_lease")
+        lease.verify(root)
+        with ProfileLease(root / ".browser.lock", root), ProfileLease(root / ".connector.lock", root):
+            state_path, state = read_state(root / "ownership.json")
+            if expected is not None and state != expected:
+                raise BrowserError("browser_recovery_state_changed")
+            profile = root / "profile"
+            root_info, info = _private_directory(root), _private_directory(profile)
+            identities = ((root_info.st_dev, root_info.st_ino), (info.st_dev, info.st_ino))
+            if identities[1] != (state.get("profile_device"), state.get("profile_inode")):
+                raise BrowserError("profile_identity_changed")
+            if state.get("persistent_profile") is True and identities[0] != (state.get("directory_device"), state.get("directory_inode")):
+                raise BrowserError("profile_identity_changed")
+            identity = state.get("identity")
+            pid = state.get("pid")
+            args = state.get("launch_args")
+            flag = "--user-data-dir=" + str(profile)
+            if (type(pid) is not int or pid <= 1 or not isinstance(identity, dict)
+                    or identity.get("pid") != pid or not identity.get("started")
+                    or not isinstance(args, list) or flag not in args
+                    or flag not in identity.get("command", "")):
+                raise BrowserError("browser_recovery_identity_unverified")
+            stamp = state_path.stat()
+            stamp = (stamp.st_dev, stamp.st_ino, stamp.st_size, stamp.st_mtime_ns)
+            deadline = time.monotonic() + 5
+            for _ in range(2):
+                rows = _recovery_process_table(deadline)
+                # A reused PID is intentionally not accepted as proof of exit.
+                # Windows retains ParentProcessId after the parent exits, so
+                # also reject orphan helpers whose command lacks the profile.
+                if (pid in rows or any(row.get("parent_pid") == pid for row in rows.values())
+                        or any(str(profile) in row.get("command", "") for row in rows.values())):
+                    raise BrowserError("profile_in_use")
+                if process_identity(pid) is not None:
+                    raise BrowserError("profile_in_use")
+                _, current = read_state(state_path)
+                now = state_path.stat()
+                current_root, current_profile = _private_directory(root), _private_directory(profile)
+                if (current != state or (now.st_dev, now.st_ino, now.st_size, now.st_mtime_ns) != stamp
+                        or ((current_root.st_dev, current_root.st_ino),
+                            (current_profile.st_dev, current_profile.st_ino)) != identities):
+                    raise BrowserError("browser_recovery_state_changed")
+                lease.verify(root)
+                if time.monotonic() >= deadline:
+                    raise BrowserError("profile_exit_not_verified")
+            state.update(status="stopped", cleanup="profile_retained_exit_verified")
+            write_state(state_path, state)
+            return {"status": "stopped", "browser_cleanup": "verified_snapshot_stopped",
+                    "profile_removed": False, "extra_signals_sent": False}
+    finally:
+        if own_lease is not None:
+            own_lease.close()
+
+
 def _remove_old_file(path):
     try: info = path.lstat()
     except FileNotFoundError: return

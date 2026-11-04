@@ -1016,8 +1016,8 @@ class Connector:
         while not self._stop.wait(5):
             try:
                 self._check_owned()
-            except ConnectorError:
-                self._fail("browser_ownership_lost")
+            except ConnectorError as error:
+                self._fail(str(error) if str(error) in _SAFE_ERRORS else "browser_ownership_lost")
                 return
 
     @staticmethod

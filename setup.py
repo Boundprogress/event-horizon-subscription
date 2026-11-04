@@ -343,6 +343,10 @@ def first_error_summary(first):
 
 def cleanup_diagnostic(error):
 
+    if str(error) in {"profile_in_use", "profile_in_use_or_unsafe_lock", "profile_identity_changed",
+                      "profile_exit_not_verified", "browser_recovery_state_changed",
+                      "browser_recovery_identity_unverified", "unsafe_profile_directory", "unsafe_profile_lock"}:
+        return {"class": "BrowserError", "reason": str(error)}
     if isinstance(error, SetupError):
         allowed = {"ownership_file_changed", "profile_changed", "browser_root_exited_before_stop",
                    "browser_root_identity_changed", "browser_tree_limit", "process_observation_deadline",
@@ -450,9 +454,24 @@ def run_owned(device, directory, *, chrome=None, headless=False, browser=None, f
                 report.setdefault('cleanup_errors', []).append('connector_shutdown_incomplete')
             elif snapshot is not None:
                 try:
-                    recorded = owned_process_snapshot(state_path, snapshot, stamp)
                     try:
-                        result = browser.stop(state_path)
+                        recorded = owned_process_snapshot(state_path, snapshot, stamp)
+                    except SetupError as error:
+                        if str(error) != "browser_root_exited_before_stop":
+                            raise
+                        if not win and snapshot.get("identity", {}).get("parent_pid") == os.getpid():
+                            try:
+                                os.waitpid(snapshot["pid"], os.WNOHANG)
+                            except ChildProcessError:
+                                pass
+                        # The user or Chrome may already have closed the window.
+                        # Reconcile only after connector shutdown, under all locks.
+                        result = browser.reconcile_stopped(state_path, lease=profile_lease, expected=snapshot)
+                        report["browser_stop_result"] = result
+                        report["browser_cleanup"] = result["browser_cleanup"]
+                        recorded = None
+                    try:
+                        result = browser.stop(state_path) if recorded is not None else result
                     except Exception as error:
                         report["browser_stop_diagnostic"] = cleanup_diagnostic(error)
                         report["browser_exit_observation"] = observe_stopped(state_path, snapshot, stamp, recorded)
