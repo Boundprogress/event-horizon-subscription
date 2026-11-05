@@ -15,11 +15,11 @@
     },
     "README.md": {
       "bytes": 4701,
-      "sha256": "ee1502101bcce03500527d5b873e4eb17212debf16ce1eedf63e3d1c9be7c1aa"
+      "sha256": "4fc3dbe3d1328777c008576369ef64c4a466bc536fe40829a7c14a0ac48c9237"
     },
     "VERSION": {
       "bytes": 22,
-      "sha256": "23867378f7dc900db1e94de5bddc51b5eb4d1218350c2f854f96f3a7f33af80c"
+      "sha256": "0ed736c1b68f58937fc0a94808e1015d4fa83c77f9dd409708b4c6b52794d115"
     },
     "account.py": {
       "bytes": 12717,
@@ -62,16 +62,16 @@
       "sha256": "0dbad9e275be932f78f2e2cbd241ada1a6a8d8a516f018610624931ed486a96a"
     },
     "panel.css": {
-      "bytes": 14010,
-      "sha256": "e94501aea8eecbdea3a148d47855ad626aab404f347dfba6b4f1801e9bd201e0"
+      "bytes": 12517,
+      "sha256": "f974d4d26a3c6503be431b56f7690d71566573805fa266123a455d3448f1413c"
     },
     "panel.html": {
       "bytes": 19588,
       "sha256": "05f3548137577b116e9213654be70a72054b0116505b04c24894a0ee097d2281"
     },
     "panel.js": {
-      "bytes": 52207,
-      "sha256": "cabd23e46f13c5482409dc0424df6be3e213bc0f9ea90cb3c0bfb7bd393d9cb2"
+      "bytes": 52172,
+      "sha256": "3d3254a2a32e7e33207907f657d2d0261ad93591f2280eec0141cc494c9cc04b"
     },
     "panel.py": {
       "bytes": 68738,
@@ -92,6 +92,10 @@
     "terms.html": {
       "bytes": 9285,
       "sha256": "42e59d173f7ce9354a1fd484f3a39332b8bad927f26a366f8536bd97eeaac50c"
+    },
+    "tests/test_appeals_ui.js": {
+      "bytes": 9604,
+      "sha256": "bf0ce12717c6c28db7945067d5ffb9af22f2cdf1012389881d12d29eaf2ffed1"
     },
     "tests/test_browser_recovery.py": {
       "bytes": 7312,
@@ -137,5 +141,5 @@
   "integrity_only": true,
   "publisher_authentication": false,
   "schema": "eh-client-source/1",
-  "version": "0.26.0-lab.20261104.1"
+  "version": "0.26.1-lab.20261105.1"
 }
