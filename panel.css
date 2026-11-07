@@ -48,3 +48,18 @@
 .rail-footer #quit{width:100%;color:#d3ded5}
 .shell>main{height:100%;min-height:0;min-width:0;margin:0 auto;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 }
+
+/* Language controls use explicit labels; account data and reports keep their content. */
+.language-picker{margin:0 0 12px;color:#aebeb4;font-size:11px;letter-spacing:.2px}
+.language-picker>span{display:block;margin-bottom:5px}
+.language-picker select{font:inherit;color:#e8ede8;background:#2c3d35;border:1px solid #53685a;border-radius:5px;padding:7px 9px;width:100%;min-height:34px}
+.language-picker select:focus-visible{outline:3px solid #9ab5ab;outline-offset:2px}
+.nav span[data-i18n]{float:none;font:inherit;opacity:1;margin:0}
+html[lang=en] .nav{font-size:12px;line-height:1.45}
+html[lang=en] .rail{padding-left:18px;padding-right:18px}
+html[lang=en] .auth-actions{flex-wrap:wrap}
+html[lang=en] .auth-actions .secondary{white-space:normal}
+html[lang=en] .connection-card .actions{flex-wrap:wrap}
+html[lang=en] .metrics strong{font-size:21px;overflow-wrap:anywhere}
+html[lang=en] .diagnostic-actions{flex-wrap:wrap}
+@media(max-width:720px){.language-picker{display:flex;align-items:center;gap:10px;margin-top:12px;margin-bottom:10px}.language-picker>span{margin:0}.language-picker select{width:auto;max-width:180px}html[lang=en] .nav{font-size:11px}.nav span[data-i18n]{display:inline}.rail-footer #quit{color:#d3ded5;border-color:#53685a}html[lang=en] .actions{flex-wrap:wrap}}

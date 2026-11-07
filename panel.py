@@ -36,7 +36,7 @@ else:
 HERE = Path(__file__).resolve().parent
 DEFAULT_ENDPOINT = 'https://api.plutoyyanng.cn'
 MAX_BODY = 8192
-ASSETS = {'/': ('panel.html', 'text/html; charset=utf-8'), '/terms': ('terms.html', 'text/html; charset=utf-8'), '/panel.js': ('panel.js', 'text/javascript; charset=utf-8'), '/panel.css': ('panel.css', 'text/css; charset=utf-8')}
+ASSETS = {'/': ('panel.html', 'text/html; charset=utf-8'), '/terms': ('terms.html', 'text/html; charset=utf-8'), '/panel_i18n.js': ('panel_i18n.js', 'text/javascript; charset=utf-8'), '/panel.js': ('panel.js', 'text/javascript; charset=utf-8'), '/panel.css': ('panel.css', 'text/css; charset=utf-8')}
 RECOVERY_OPS = {'email_request','email_verify','email_change_request','email_change_confirm','recovery_request','recovery_reset','recovery_manual_request','recovery_manual_confirm'}
 CODE_OPS = {'email_code_request', 'email_code_verify', 'recovery_code_request', 'recovery_code_verify', 'recovery_code_reset', 'recovery_cancel'}
 OPERATIONS = RECOVERY_OPS | {'redeem', 'prepare', 'activation_receipts', 'support_export', 'agent_export', 'update_check', 'update_apply', 'quit', 'register', 'login', 'logout', 'password', 'refresh', 'key_create', 'key_rotate', 'key_revoke', 'device_enroll', 'device_rotate', 'device_revoke', 'device_enable', 'check', 'diagnose', 'connect', 'disconnect', 'acknowledge'}

@@ -1,20 +1,61 @@
-# Event Horizon · 客户端
+# Event Horizon · Browser Automation for AI Agents
 
-把你自己的 Agent，接到你自己的浏览器。
+[中文](README.md) | [English](README.en.md)
 
-EH 将网页中可见的内容和操作目标整理成结构化信息，再把执行状态交给 Agent。Chrome 在本机运行，网页采样需要发送到云端处理；模型与 Agent 由你选择。
+**0 条站点规则，让你的 Agent 操作浏览器、核对结果、交付任务。**
 
-版本：`0.26.1-lab.20261105.1`。本仓库是 Python 标准库薄客户端，包含本机控制台、浏览器连接器和 MCP Skill；使用配套在线服务需要有效订阅。
+Event Horizon（EH）通过 **MCP（Model Context Protocol）** 为你已有的 AI Agent 接入网页自动化（browser automation）：搜索、点击、填写表单、筛选排序、翻页进详情，再把采集结果与页面依据交回当前 Agent。你提出任务，Agent 负责规划，EH 提供页面信息、执行操作并返回状态。
 
-解压后可直接启动。用户文档见 [docs/README.md](docs/README.md)。
+Browser automation and web automation over MCP, with zero site-specific rules to author. Bring your own AI agent to search, click, fill forms, and extract data in your local Chrome, then return results with page evidence.
 
-## 想先看看
+Chrome 在本机运行，网页采样需要发送到云端处理；模型与 Agent 由你选择。**0 条站点规则**指使用通用网页操作流程时，无需用户逐站编写选择器或点击脚本；不代表任意网站、任意任务都能完成。[能力与边界](docs/CAPABILITIES.md)
 
-[EH demo](https://github.com/Boundprogress/event-horizon-demo) 保留了历史实测、视频和失败记录。那些结果对应当时版本与部署，不是本版的效果保证。
+版本：`0.27.0-lab.20261107.1`。本仓库是 Python 标准库薄客户端，包含本机控制台、浏览器连接器和 MCP Skill；使用配套在线服务需激活试用权益。
+
+解压后可直接启动。用户文档见 [docs/README.md](docs/README.md)。本机控制台支持**中文 / English**，可通过语言切换选择界面语言。
+
+## 公开测试与免费试用
+
+**EH 当前处于公开测试阶段，提供免费试用。** 已获赠激活码可在客户端激活；尚未获得赠送激活码，可发邮件至运营邮箱 [eventhorizontest@163.com](mailto:eventhorizontest@163.com) 申请，简单说明使用环境和拟测试的任务即可。
+
+试用额度与有效状态以激活结果和账号显示为准。自带模型、宿主或其他第三方服务可能另行产生费用。
+
+测试版本可能出现错误、中断或结果不完整，不保证特定网站或任务均能完成。请仅在有权访问和操作的范围内试用，对关键操作与输出结果进行人工核对，并阅读客户端展示的服务协议。本说明不影响依法不得排除或限制的责任。
+
+## 三个核心能力
+
+| 核心能力 | 对你的任务意味着什么 |
+| --- | --- |
+| **0 条站点规则** | 换站沿用同一套工具，无需用户逐站预写选择器或固定点击脚本。具体页面的可用范围仍需验证。 |
+| **真实操作** | 在网页上搜索、点击、填写、筛选、翻页和处理弹窗；操作后返回回执与页面状态，受阻或未确认时据此核对。 |
+| **交付可核对** | Agent 将列表、字段与来源整理为答案，说明已完成什么、还缺什么；未确认的请求可沿原编号查回。 |
+
+接入能加载本机 MCP 工具的宿主，沿用自己的模型与 Agent。专属浏览器保留网站允许持久保存的登录态；过期与重新验证由网站决定。
+
+**点击成功只是一步，用户要的是任务结果。** EH 把页面状态与操作回执交给 Agent，帮助它判断下一步；最终答案的对象、字段、数量和来源仍须逐项核对。
+
+任务受阻或结果未确认时，Agent 应说明阻塞与缺项，查回状态后再决定下一步。
+
+## 可以交给 Agent 的任务
+
+- **多条件查询**：输入日期、地点或价格条件，筛选排序后打开详情，整理符合要求的条目。
+- **跨页资料整理（data extraction）**：翻页查找指定公告，进入关联页，汇总字段并附上来源。
+- **网页表单（form filling）**：填写授权范围内的输入项，核对当前值与页面反馈，再决定是否继续。
+- **跨站信息比较**：把不同网页读到的价格、时间或条件放在一起，给出有依据的比较结果。
+
+这些是任务表达示例，完成情况取决于目标网页、模型与授权范围。批量固定结构的数据采集（web scraping），可同时评估正式 API 或授权数据接口。
 
 ## 能力与公开演示
 
 支持页面结构读取、条件输入、筛选排序、分页详情、弹窗和关联页等交互，再由 Agent 决定下一步。demo 的六题连续实况覆盖了这些组合；对应合成站点与驾驶配置，详见 [六题说明与核对入口](https://github.com/Boundprogress/event-horizon-demo/blob/ac0236cd19560efa5f43ba350bbc599ff4158fc4/video/testsite_live_0921/README.md)。历史演示不构成当前所有站点的交付保证。
+
+[EH demo](https://github.com/Boundprogress/event-horizon-demo) 保留了历史实测、视频和失败记录。[历史实测与核对入口](docs/DEMO_EVIDENCE.md) 区分了运行结束、交付判定与逐字段事实核验，便于按原始条件判断。
+
+## 选择 Browser Use（browser-use / browseruse）、Playwright MCP 等工具时
+
+接入方式、目标网页和结果要求，决定了 browser automation 工具是否适合你的任务。可以从三件事开始核对：能否接入已有 Agent、换站是否需要维护脚本、交回结果是否有页面依据。
+
+EH 聚焦 **0 条站点规则、真实操作、交付可核对**，通过 MCP 接入你的 Agent，在本机 Chrome 完成网页任务。关于已有社区讨论与 EH 的产品选择，见 [从网页操作到可核对的交付](docs/BROWSER_USE_COMPARISON.md)。
 
 ## 想用
 
@@ -40,18 +81,18 @@ py -3 -I -S -B eh.py start
 不需要 `pip install .`。启动会打开本机控制台，终端需要保持运行。
 
 1. 注册并验证邮箱，阅读服务协议。
-2. 通过运营渠道购买激活码，在“购买与激活”中激活。
+2. 使用获赠激活码，在客户端账号页填写并激活；尚未获得可邮件申请。
 3. “准备本机使用” → “连接浏览器”。
 4. “复制一句话接入” → 交给可信的本机 Agent。
 5. 等 Agent 实际检查工具与连接，再提出任务。
 
-无需选择宿主产品。复制指令只准备本机资料，宿主加载成功才算接通；API Key 和设备凭据不需要粘贴到聊天。服务是否开放、配套版本、套餐与余额，以运营公布及账号实际状态为准。
+无需选择宿主产品。复制指令只准备本机资料，宿主加载成功才算接通；API Key 和设备凭据不需要粘贴到聊天。服务开放情况、配套版本、试用额度与有效状态，以运营公布及账号实际显示为准。
 
 ## 接上以后
 
 任务结果在当前 Agent 中查看；遇到未确认操作，沿原请求号查回，不反复提交。关键操作需要明确授权，结果仍要对照页面核实。
 
-支持月套餐与永久总帧数两种权益。永久额度按激活码追加总帧数，永久有效，用完即止，不按月重置；月套餐仍按自然月计量，提前续期不刷新当期额度。有效月套餐与永久额度不能直接叠加，购买前请核对账号套餐类型。
+试用权益以实际激活结果为准；可在账号页查看剩余额度与有效状态。额度不足或无法使用时，可邮件联系运营核对。
 
 公开 HTTP(S) 站点不要求精确白名单，敏感站点和私有网络入口受限制。浏览器在本机，页面采样仍会经过云端；请先阅读控制台中的服务协议。
 
@@ -77,6 +118,6 @@ python3 -I -S -B client.py audit --package-dir . --json-only
 
 ## 代码许可
 
-代码采用 **GNU Affero General Public License v3.0 only（AGPL-3.0-only）**，见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。第三方材料保留各自许可；使用在线订阅服务另行适用控制台展示的服务协议。
+代码采用 **GNU Affero General Public License v3.0 only（AGPL-3.0-only）**，见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。第三方材料保留各自许可；使用在线服务另行适用控制台展示的服务协议。
 
 如果需要私有本地部署请联系[eventhorizontest@163.com](mailto:eventhorizontest@163.com)

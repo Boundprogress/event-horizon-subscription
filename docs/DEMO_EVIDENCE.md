@@ -1,5 +1,7 @@
 # 历史实测与核对入口
 
+[中文](DEMO_EVIDENCE.md) | [English](DEMO_EVIDENCE.en.md)
+
 本页精选 EH demo 的能力展示材料，并保留实验条件、统计口径和原始核对入口。它是历史资料整理，没有在当前订阅版上重新运行这些实验。
 
 引用版本固定为 demo 提交 [`ac0236cd19560efa5f43ba350bbc599ff4158fc4`](https://github.com/Boundprogress/event-horizon-demo/tree/ac0236cd19560efa5f43ba350bbc599ff4158fc4)。原视频与原始记录仍在原仓库，不在这里改写或重新计分。
