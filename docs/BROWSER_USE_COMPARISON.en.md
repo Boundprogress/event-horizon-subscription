@@ -42,7 +42,7 @@ Evaluate the combined experience on your own pages and tasks. [Public testing an
 ## Limits to understand before use
 
 - **Zero site-specific rules describes the workflow:** users do not write rules for each site. Page changes, complex controls, Canvas, login verification, and access restrictions can still affect completion.
-- **Local browser, cloud processing:** Chrome runs locally, while page samples must be sent to EH in the cloud. EH is currently in public testing; the free trial requires activation of complimentary trial access.
+- **Local browser, cloud processing:** Chrome runs locally, while page samples must be sent to EH in the cloud. EH is currently in public testing. New accounts automatically receive a one-time total of 1,000 free frames on successful registration, with no expiry or monthly reset. Usage stops when the balance is exhausted.
 - **Results still need acceptance checks:** action receipts, task delivery, and factual correctness of every field require separate checks. They cannot stand in for one another.
 - **Understand the record scope:** the client does not automatically save or replay task-content history. Checking an original request ID is different from long-term historical replay.
 

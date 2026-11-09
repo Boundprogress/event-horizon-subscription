@@ -68,11 +68,11 @@ The browser's debugging port is still assigned dynamically by the system. This d
 
 Upgrades from 0.25.4 or earlier do not automatically merge older temporary browser directories. Sign in to websites again the first time; the account's dedicated profile is retained afterward. Keep using your existing data directory when updating the client. Changing the data directory creates a new browser profile. Signing out of EH does not delete saved website login state.
 
-## How do I request and activate the free trial?
+## How do I get the free trial allowance?
 
-EH is currently in public testing and offers a free trial. If you have a complimentary activation code, enter and activate it on the client's account page. Otherwise, request a code from [eventhorizontest@163.com](mailto:eventhorizontest@163.com), briefly describing your environment and intended test tasks.
+EH is currently in public testing. New accounts automatically receive **1,000 free frames** when registration succeeds, without an email request or activation code. This is a one-time total allowance with no expiry. It does not reset monthly, and usage stops when the balance is exhausted.
 
-Your trial allowance and access status are determined by the activation result and account display. The test version may produce errors or interruptions; important actions and outputs still need manual checking. Your own model, host, or other third-party services may incur separate charges. Read the service agreement displayed in the client first.
+Check your actual remaining balance and access status on the client's account page. If you have a permanent-frame activation code, redeem it there to add frames. For unexpected balance or access issues, contact [eventhorizontest@163.com](mailto:eventhorizontest@163.com). The test version may produce errors or interruptions; important actions and outputs still need manual checking. Your own model, host, or other third-party services may incur separate charges. Read the service agreement displayed in the client first.
 
 ## How do I confirm that the client has exited?
 

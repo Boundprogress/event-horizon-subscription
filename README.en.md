@@ -8,15 +8,15 @@ Event Horizon (EH) connects your existing AI agent to **browser automation and w
 
 Chrome runs locally; page samples are sent to the cloud for processing. You choose your model and agent. **Zero site-specific rules** means users do not need to write selectors or click scripts for each site when using the general browser workflow. It does not mean every website or task will succeed. See [capabilities and limits](docs/CAPABILITIES.en.md).
 
-Version: `0.27.0-lab.20261107.1`. This repository contains a thin client built with the Python standard library, including a local console, browser connector, and MCP skill. The companion online service requires activated trial access.
+Version: `0.27.1-lab.20261109.1`. This repository contains a thin client built with the Python standard library, including a local console, browser connector, and MCP skill. New accounts automatically receive 1,000 free trial frames when registration succeeds.
 
 Start the client directly after extracting the package. See the [user documentation](docs/README.en.md). The local console supports **Chinese and English**; use the language switch to select your preferred interface language.
 
 ## Public testing and free trial
 
-**EH is currently in public testing and offers a free trial.** If you have received a complimentary activation code, activate it in the client. To request a code, email [eventhorizontest@163.com](mailto:eventhorizontest@163.com) with a short description of your environment and the tasks you would like to test.
+**EH is currently in public testing. New accounts automatically receive 1,000 free frames when registration succeeds, without an email request or activation code.** This is a one-time total allowance with no expiry. It does not reset monthly, and usage stops when the balance is exhausted.
 
-Your trial allowance and access status are shown after activation and in your account. Your own model, agent host, or other third-party services may incur separate charges.
+Check your actual remaining balance and access status on the client's account page. If you have a permanent-frame activation code, you can redeem it there to add frames. Your own model, agent host, or other third-party services may incur separate charges.
 
 This test version may produce errors, interruptions, or incomplete results. It does not guarantee completion on any particular website or task. Test only within your authorized access and action scope, manually check important actions and outputs, and read the service agreement displayed in the client. This notice does not affect any liability that cannot lawfully be excluded or limited.
 
@@ -78,8 +78,8 @@ If your system only provides the `python` command, run `python -I -S -B eh.py st
 
 You do not need `pip install .`. Startup opens the local console; keep the terminal running. Select **English** in the console's language switch if needed.
 
-1. Register, verify your email address, and read the service agreement.
-2. Enter your complimentary activation code on the account page and activate it. Request a code by email if you do not have one.
+1. Read the service agreement and register an account. Verify your email so it can be used for account recovery.
+2. Registration automatically grants a one-time total of 1,000 frames. Check it on the account page. The allowance has no expiry or monthly reset; usage stops when the balance is exhausted.
 3. Prepare local setup, then connect the browser.
 4. Copy the setup instruction and give it to a trusted local agent.
 5. Wait for the agent to actually check the tools and connection before giving it a task.
@@ -90,7 +90,7 @@ You do not need to choose a host product in the console. Copying the instruction
 
 View task results in your current agent. Check unconfirmed operations using the original request ID instead of submitting them repeatedly. Important actions require explicit authorization, and results still need to be checked against the page.
 
-Trial access is determined by the actual activation result. Check your remaining allowance and access status on the account page. If your allowance is insufficient or access is unavailable, email operations for assistance.
+The registration allowance is a one-time total of 1,000 frames. The account page shows your actual remaining balance and access status. If you need more frames, redeem a permanent-frame activation code to add to the balance. If access is unavailable, email operations for assistance.
 
 Public HTTP(S) sites do not require an exact allowlist, but sensitive sites and private-network destinations are restricted. The browser runs locally while page samples still pass through the cloud. Read the service agreement in the console first.
 

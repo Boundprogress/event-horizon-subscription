@@ -14,16 +14,16 @@
       "sha256": "1af87ef026ff5bde84b061f9607c77cd8320ca92da1e73a55254a6d0b2828237"
     },
     "README.en.md": {
-      "bytes": 10297,
-      "sha256": "28ecab95b8d1b99e9b8348a943b22ef42c2fea4561798ab418264a3f7eb84ae1"
+      "bytes": 10546,
+      "sha256": "a2693b2a99996b1f982809d6052e9a43d6ec53371da60cc35c56b3ec6adac85e"
     },
     "README.md": {
-      "bytes": 8665,
-      "sha256": "f71abe4859b543d62a5a76e5d9e2eb1e048ab0d5ae4ce324b04da722a733e2be"
+      "bytes": 8811,
+      "sha256": "db8e8cce9ee4703291c6c0937646fb4f7e028239099b011e6cfd7278c19d5746"
     },
     "VERSION": {
       "bytes": 22,
-      "sha256": "2f19d569774f8a1d66e432df2b3c1dc9476822e95a70bbc22b88febe19e77ace"
+      "sha256": "e3604c86288891f482feee91dc0d64517899ec7d648f32251a1ecef92ca8ec6b"
     },
     "account.py": {
       "bytes": 12717,
@@ -42,12 +42,12 @@
       "sha256": "566f17ab6e1c3d295d868a9b14270e5efd63a6374970c255d2c9f346275a5a4a"
     },
     "docs/BROWSER_USE_COMPARISON.en.md": {
-      "bytes": 4498,
-      "sha256": "cb31fc05620171947cb4a84aa81e35446547814451e544bbfd036ae337ad69dd"
+      "bytes": 4609,
+      "sha256": "6ce8187f55e1d306c099f29dd6cbd89313cd807abd3f26b4833a6d3a5b2a834a"
     },
     "docs/BROWSER_USE_COMPARISON.md": {
-      "bytes": 3792,
-      "sha256": "00de190d86669da45151ac8069641f3cbc2f064f21c03b5d809b30b755a03656"
+      "bytes": 3867,
+      "sha256": "fd13f6108ea908408295bad1fe671a62e1f0259edbdaa833e80d60074b33c0c0"
     },
     "docs/CAPABILITIES.en.md": {
       "bytes": 6571,
@@ -66,12 +66,12 @@
       "sha256": "607d03d9a41f9c2abbc41c6fece0e473622447ba786686fb7f57c1ed40a954a4"
     },
     "docs/FAQ.en.md": {
-      "bytes": 10865,
-      "sha256": "aa8d49d18128a5a274547b2b54f2fadc4f67cfdb1e7ace960012912bf58b3583"
+      "bytes": 11011,
+      "sha256": "dadd2fb27b327f1415b04eb9922e60f09319f6a9b11372793995919b3e020add"
     },
     "docs/FAQ.md": {
-      "bytes": 8854,
-      "sha256": "57a1f3d71c2fcd558485dd8cea7032b6864c1e9333465c732e743691c861a472"
+      "bytes": 8966,
+      "sha256": "1f994819dbb912315774f2661564f8ee1392e44e482270574c60f0f1c387154c"
     },
     "docs/README.en.md": {
       "bytes": 685,
@@ -94,20 +94,20 @@
       "sha256": "0760aff2f222b8f9014739d5924e64c5353b9d4567dfcdf248b1e5502d00bc41"
     },
     "panel.html": {
-      "bytes": 31563,
-      "sha256": "ec0efa08a6ea9de0ca02121400c739e2a8c93761c8d205644b063c743356b760"
+      "bytes": 31814,
+      "sha256": "5748d8dd68d423f42e5531b3b72266d3dec963e65482f25b7a68f362ff17b5fc"
     },
     "panel.js": {
-      "bytes": 55983,
-      "sha256": "f4ffd308d2232cd070c56074fd2630f41f210ddf0ed4c04ea725c5cb1dda89a6"
+      "bytes": 56890,
+      "sha256": "017e7e5fdcce9e38b143a7ab0e2814f1a6a8cea9708e5c11a4a25a5979832ae3"
     },
     "panel.py": {
       "bytes": 68809,
       "sha256": "252aa096e159c418d7ddd86d5bf497d3cbe23f3892bdb0cb4e55be6d66fb5562"
     },
     "panel_i18n.js": {
-      "bytes": 60192,
-      "sha256": "37f3387069f95258995a15664be4decfc3d8b609798d577d55192812588e0e1c"
+      "bytes": 61834,
+      "sha256": "d576c9a7e9309b674c5aa709b7fa6fccc686b2d78bef4ed02fd5c8761425bceb"
     },
     "sensitive_domains.json": {
       "bytes": 2032,
@@ -150,8 +150,8 @@
       "sha256": "cffff87a0d0549bcbaa39bcc6144bfad9c7e79080c171b303172ebd2842ea7cb"
     },
     "tests/test_panel_i18n.js": {
-      "bytes": 18730,
-      "sha256": "aaa3f2ebc7aa72ba6c2959832a58a1f882c078e271bf1c6f22d67d284c3db856"
+      "bytes": 22221,
+      "sha256": "f68c50b79c36ea3175139413b0c29a3383df15dd0cbda5ea113ace8383e6d1ed"
     },
     "tests/test_panel_recovery.py": {
       "bytes": 7713,
@@ -174,12 +174,12 @@
       "sha256": "d2f5275b5c9a18b45518dde7b2bf8a910b0129b4f5e6ef34b345cfa7ebf0b3cb"
     },
     "赠送激活码-20个.txt": {
-      "bytes": 1383,
-      "sha256": "66c6131405cc4676bd0bbd040822542c517df2728d20efbfbcd77f22957f4998"
+      "bytes": 1816,
+      "sha256": "82df1c93aa06acc84f40240f57a233879f8bc64b062ebba3bbb55706cef732e5"
     }
   },
   "integrity_only": true,
   "publisher_authentication": false,
   "schema": "eh-client-source/1",
-  "version": "0.27.0-lab.20261107.1"
+  "version": "0.27.1-lab.20261109.1"
 }

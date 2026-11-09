@@ -18,8 +18,8 @@ let termsRenderKey=null,appealHistory=null;
 let state=null,busy=false,mode='login',view='overview',reauth=false,closing=false;
 let supportReport=null,displayAccount=null,agentLink=null,agentScope=null;
 let awaitingConnectionFeedback=false,displayedNotice=null;
-const titles=labels({overview:'准备好，让浏览器开始工作。',account:'领取试用，激活后开始使用。',diagnostics:'让连接状态清楚可见。'});
-const messages=labels({terms_required:'请阅读并显式确认当前协议后再发起新的网页任务。',terms_update_required:'本机展示的协议与服务端版本或正文不同，请更新客户端后重新阅读。',terms_document_unavailable:'本机协议正文缺失或校验失败，请更新客户端。',invalid_request_reference:'请填写有效请求号：1–64 位字母、数字、点、下划线或短横线。',session_not_found:'未找到该任务。请核对原编号和当前账号；查询结果不代表可以重放操作。',request_not_found:'未找到该请求。请核对原编号；不要据此认定操作未执行或直接重放。',forbidden:'当前账号无权读取该记录。',unauthorized:'当前 Key 无效，请核对凭据。',invalid_remote_response:'服务返回格式异常，请稍后按原编号查询。',active_key_exists_rotate_required:'账号已有连接配置，请刷新状态后在连接诊断中核对。',active_key_changed_refresh_required:'有效 Key 已变化，请刷新核对后再操作。',subscription_disabled:'账号权益已停用，请联系运营核对；重复激活不会解除停用。',subscription_quota:'可用额度已用完，请查看账号额度。',subscription_not_started:'订阅尚未开始。',invalid_identifier:'名称仅支持 1–64 位英文字母、数字、点、下划线和短横线。',invalid_username:'用户名须为 1–64 个字符，支持中文和自定义名称；请勿使用控制字符或不可见字符。',console_access_required:'请从启动器重新打开控制台链接。',invalid_credentials:'用户名或密码不正确。',username_taken:'该用户名已注册，请登录。',account_login_required:'登录已过期，请重新登录。',login_required:'请先登录。',subscription_inactive:'账号尚未激活，请在免费公测与激活页输入赠送的激活码。',subscription_expired:'订阅已到期。',quota_exhausted:'可用额度已用完，请查看账号额度。',credentials_required:'请先点击准备本机使用，完成连接配置。',service_update_required:'服务端尚未升级到支持协议版本的版本，暂时无法注册；请联系运营更新服务。',previous_operation_requires_review:'上次请求尚未确认，请先核对远端状态。',response_unknown_check_remote_state:'响应未确认，操作可能已生效。请刷新并核对状态，不要重复提交。',disconnect_or_review_previous_connection:'请先断开浏览器；若上次异常退出，需要核实原浏览器的退出状态。',device_already_registered_rotate_if_credential_lost:'设备已经登记。若本机凭据丢失，请核对后换发设备凭据。',device_not_registered:'请先登记设备。',operation_in_progress:'上一个操作仍在处理中，请稍候。',api_key_limit:'Key 历史记录已达上限，请联系运营。',chrome_not_found:'未找到 Chrome，请先安装 Chrome。',private_directory_required:'数据目录必须仅供当前用户访问。',device_waiting_for_hub:'设备变更已保存，连接服务尚未确认应用；这还不代表设备已连接。',previous_connection_unconfirmed:'上次连接未确认退出。请到连接诊断点击“核实退出并恢复连接”，保留原数据目录。',browser_recovery_connection_running:'旧连接器仍在运行。请先点击断开浏览器，等待退出后再核实。',browser_recovery_directory_unverified:'原浏览器目录未通过核实，请保留原数据目录并联系支持人员检查。',browser_recovery_unconfirmed:'退出仍未确认。请先关闭旧 EH 工作浏览器并停止旧 EH 客户端连接，再点击核实；若仍失败，请保留原数据目录并提供诊断摘要。'});
+const titles=labels({overview:'准备好，让浏览器开始工作。',account:'注册即获额度，准备开始使用。',diagnostics:'让连接状态清楚可见。'});
+const messages=labels({terms_required:'请阅读并显式确认当前协议后再发起新的网页任务。',terms_update_required:'本机展示的协议与服务端版本或正文不同，请更新客户端后重新阅读。',terms_document_unavailable:'本机协议正文缺失或校验失败，请更新客户端。',invalid_request_reference:'请填写有效请求号：1–64 位字母、数字、点、下划线或短横线。',session_not_found:'未找到该任务。请核对原编号和当前账号；查询结果不代表可以重放操作。',request_not_found:'未找到该请求。请核对原编号；不要据此认定操作未执行或直接重放。',forbidden:'当前账号无权读取该记录。',unauthorized:'当前 Key 无效，请核对凭据。',invalid_remote_response:'服务返回格式异常，请稍后按原编号查询。',active_key_exists_rotate_required:'账号已有连接配置，请刷新状态后在连接诊断中核对。',active_key_changed_refresh_required:'有效 Key 已变化，请刷新核对后再操作。',subscription_disabled:'账号权益已停用，请联系运营核对；重复激活不会解除停用。',subscription_quota:'可用额度已用完，请查看账号额度。',subscription_not_started:'订阅尚未开始。',invalid_identifier:'名称仅支持 1–64 位英文字母、数字、点、下划线和短横线。',invalid_username:'用户名须为 1–64 个字符，支持中文和自定义名称；请勿使用控制字符或不可见字符。',console_access_required:'请从启动器重新打开控制台链接。',invalid_credentials:'用户名或密码不正确。',username_taken:'该用户名已注册，请登录。',account_login_required:'登录已过期，请重新登录。',login_required:'请先登录。',subscription_inactive:'账号尚无可用权益，请刷新账号额度；若未显示注册额度，请联系运营核对。',subscription_expired:'订阅已到期。',quota_exhausted:'可用额度已用完，请查看账号额度。',credentials_required:'请先点击准备本机使用，完成连接配置。',service_update_required:'服务端尚未升级到支持协议版本的版本，暂时无法注册；请联系运营更新服务。',previous_operation_requires_review:'上次请求尚未确认，请先核对远端状态。',response_unknown_check_remote_state:'响应未确认，操作可能已生效。请刷新并核对状态，不要重复提交。',disconnect_or_review_previous_connection:'请先断开浏览器；若上次异常退出，需要核实原浏览器的退出状态。',device_already_registered_rotate_if_credential_lost:'设备已经登记。若本机凭据丢失，请核对后换发设备凭据。',device_not_registered:'请先登记设备。',operation_in_progress:'上一个操作仍在处理中，请稍候。',api_key_limit:'Key 历史记录已达上限，请联系运营。',chrome_not_found:'未找到 Chrome，请先安装 Chrome。',private_directory_required:'数据目录必须仅供当前用户访问。',device_waiting_for_hub:'设备变更已保存，连接服务尚未确认应用；这还不代表设备已连接。',previous_connection_unconfirmed:'上次连接未确认退出。请到连接诊断点击“核实退出并恢复连接”，保留原数据目录。',browser_recovery_connection_running:'旧连接器仍在运行。请先点击断开浏览器，等待退出后再核实。',browser_recovery_directory_unverified:'原浏览器目录未通过核实，请保留原数据目录并联系支持人员检查。',browser_recovery_unconfirmed:'退出仍未确认。请先关闭旧 EH 工作浏览器并停止旧 EH 客户端连接，再点击核实；若仍失败，请保留原数据目录并提供诊断摘要。'});
 function say(read,error=false){awaitingConnectionFeedback=false;feedbackView={read,error};renderFeedback();}
 Object.assign(messages,{activation_code_invalid_or_unavailable:'激活码无效或不可使用，请核对完整内容或邮件联系运营。',activation_request_conflict:'该请求号已用于另一激活码，请先查询激活记录。',activation_rate_limited:'激活操作过于频繁，请稍后再试。',subscription_reactivation_review_required:'账号权益已停用，需要运营核对后恢复；重复激活不能解除停用。',email_service_unavailable:'邮箱服务尚未启用，请联系运营。',email_queue_busy:'邮件队列繁忙，请稍后重新申请。',email_rate_limited:'申请或验证过于频繁，请15分钟后再试。',invalid_email:'请填写有效的邮箱地址。',email_proof_invalid_or_expired:'凭证无效、已过期或已使用，请检查完整内容或重新申请。',email_already_verified:'该账号已经验证邮箱，请使用更换邮箱。',email_not_verified:'请先验证首次绑定邮箱。',email_unchanged:'新邮箱须与当前绑定不同。',account_recovery_requires_quiet:'账号仍有业务任务，请先联系运营核对并关闭任务。',invalid_login:'用户名或密码不正确。'});
 Object.assign(messages,{email_code_invalid_or_expired:'验证码不正确、已过期或已使用。请核对6位数字，或点击重新申请。',email_already_registered:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_in_use:'该邮箱已关联账号，请使用账号找回，或换一个邮箱。',email_unavailable:'该邮箱暂不可用于注册，请使用账号找回或换一个邮箱。',email_required:'注册时请填写邮箱，并在注册后完成邮箱验证。',email_not_pending:'当前没有待验证的注册邮箱，请刷新账号状态。',recovery_response_unknown_restart:'找回响应未确认，原操作可能已生效；不会自动重试。请尝试新密码登录，或点击重新申请验证码。',email_response_unknown_restart:'邮箱验证响应未确认，原操作可能已生效；不会自动重试。请刷新邮箱状态，未验证时可明确重新发送验证码。'});
@@ -48,10 +48,10 @@ review_operation:['上次操作还需核对','操作可能已经生效。请在�
 review_connection:['先确认旧浏览器已退出','上次清理未确认。请在连接诊断点击“核实退出并恢复连接”，完成后即可重新连接。','查看诊断','diagnostics'],
 review_device_connection:['设备连接被云端拒绝','本机专属 Chrome 已关闭。可能是设备凭据已失效，也可能有其他端正在连接。请先停止其他端，再重试连接；仍需在本机使用时，可到诊断页确认换发设备凭据。','核对设备连接','diagnostics'],
 activation_review:['账号权益需要审核','请邮件联系运营核对并恢复权益。重复激活不能解除停用，已有激活记录仍可查询。','查看账号状态','account'],
-activation:['领取并激活试用','免费公测期间，请邮件联系 eventhorizontest@163.com 申请赠送激活码，再到账号页激活。','去激活','account'],
-expired:['订阅已到期','请邮件联系运营申请试用续期，获得赠送激活码后激活。','激活续期','account'],
-quota:['可用额度已用完','请核对账号余额。永久额度可兑换永久激活码充值；月套餐提前续期不会重置当期额度。','查看额度','account'],
-create_key:['准备本机使用','权益已激活。客户端会为本机准备连接配置，然后可以连接浏览器。','准备本机使用','prepare'],
+activation:['核对账号额度','新注册账号自动获得 1000 帧永久总额度。当前账号尚未显示可用权益，请刷新账号状态或联系运营核对。','查看账号额度','account'],
+expired:['订阅已到期','请核对账号有效期；如需继续使用，请联系运营核对后续额度。','查看账号状态','account'],
+quota:['可用额度已用完','永久额度用完即止，不按月重置。如需追加总帧数，可兑换永久激活码；既有月套餐提前续期不会重置当期额度。','查看额度','account'],
+create_key:['准备本机使用','账号额度已就绪。客户端会为本机准备连接配置，然后可以连接浏览器。','准备本机使用','prepare'],
 recover_key:['核对本机连接配置','本机连接配置与账号状态不匹配。请在连接诊断核对后修复；如需换发，旧配置将失效。','修复连接','diagnostics'],
 enroll_device:['准备本机使用','连接配置已部分完成，继续登记本机设备。','继续准备','prepare'],
 recover_device:['修复本机设备连接','本机设备连接需要核对。请在连接诊断中明确修复；换发时旧设备凭据将失效。','修复连接','diagnostics'],
@@ -59,7 +59,7 @@ enable_device:['设备已停用','在连接诊断核对设备后，明确启用�
 connect:['连接专属浏览器','本机准备完成。点击连接会检查 Chrome 并尝试连接，实际状态以连接结果为准。','连接浏览器','connect'],
 connecting:['正在等待浏览器连接','请等待连接结果；失败时查看诊断，不会自动重放任务。','等待连接',null],
 agent:['把 EH 接入你的 Agent','浏览器已连接。复制一句话给本机 Agent，让它读取资料、完成配置并检查 EH 状态。','复制一句话接入','agent_connect']});
-function currentGuide(){return state?.pending?.operation==='redeem'?[t("核对激活结果"),t("到免费公测与激活页查询激活记录。响应未确认不代表兑换失败，请勿重复提交。"),t("查询激活结果"),'account']:(guideStages[state?.onboarding?.stage]||guideStages.refresh);}
+function currentGuide(){return state?.pending?.operation==='redeem'?[t("核对激活结果"),t("到账号与额度页查询激活记录。响应未确认不代表兑换失败，请勿重复提交。"),t("查询激活结果"),'account']:(guideStages[state?.onboarding?.stage]||guideStages.refresh);}
 function renderOnboarding(){const g=currentGuide();uiText($('guide-title'),()=>g[0]);uiText($('guide-copy'),()=>g[1]);uiText($('guide-next'),()=>g[2]);$('guide-next').disabled=busy||closing||!g[3];
 }
 function renderAppeals(){
@@ -111,7 +111,7 @@ $('auth').hidden=s.signed_in&&!reauth;$('recovery').hidden=s.signed_in&&!reauth;
 uiText($('username'),()=>s.username||t("账号"));
 const pendingSnapshot=s.pending?{...s.pending}:null;
 $('pending').hidden=!pendingSnapshot;
-if(pendingSnapshot)uiText($('pending-text'),()=>pendingSnapshot.operation==='appeal_create'?t("账号申诉结果尚未确认（请求号 {p0}）。请在账号页查询原申诉；查询不会重发说明，查到后再解除核对提示。",{p0:pendingSnapshot.request_id}):pendingSnapshot.operation==='redeem'?t("激活结果尚未确认（请求号 {p0}）。请到“免费公测与激活”查询激活记录，核对后再继续；不要重复提交激活码。",{p0:pendingSnapshot.request_id}):t("操作 {p0} 尚未确认（{p1}）。可先刷新账号状态，核对 Key / 设备是否已经生效。登记或换发的凭据若未保存，需明确换发；请勿直接重复原操作。",{p0:pendingSnapshot.operation,p1:date(pendingSnapshot.started_at)}));
+if(pendingSnapshot)uiText($('pending-text'),()=>pendingSnapshot.operation==='appeal_create'?t("账号申诉结果尚未确认（请求号 {p0}）。请在账号页查询原申诉；查询不会重发说明，查到后再解除核对提示。",{p0:pendingSnapshot.request_id}):pendingSnapshot.operation==='redeem'?t("激活结果尚未确认（请求号 {p0}）。请到“账号与额度”查询激活记录，核对后再继续；不要重复提交激活码。",{p0:pendingSnapshot.request_id}):t("操作 {p0} 尚未确认（{p1}）。可先刷新账号状态，核对 Key / 设备是否已经生效。登记或换发的凭据若未保存，需明确换发；请勿直接重复原操作。",{p0:pendingSnapshot.operation,p1:date(pendingSnapshot.started_at)}));
 else uiText($('pending-text'),()=>'');
 
 const terms=s.terms_document||{},expected=cloud?.terms;
@@ -124,7 +124,7 @@ $('terms-accept-form').querySelector('button').disabled=busy||Boolean(s.pending)
 const status={offline:t("未连接"),starting:t("正在连接"),connected:t("已连接"),stopped:t("已断开"),failed:t("连接失败"),cleanup_unknown:t("退出待核实")};
 uiText($('connection-badge'),()=>status[c.status]||t("未连接"));$('connection-badge').className='badge'+(c.status==='connected'?' online':'');
 uiText($('connection-title'),()=>c.status==='connected'?t("浏览器已连接"):running?t("正在准备浏览器"):s.onboarding?.stage==='review_device_connection'?t("设备连接被云端拒绝"):t("连接你的本地浏览器"));
-uiText($('connection-copy'),()=>c.status==='connected'?t("本机浏览器已接入 EH。现在可以让你的 agent 发起任务。"):c.status==='cleanup_unknown'||s.notice==='previous_connection_unconfirmed'?t("上次退出未获确认。请到连接诊断点击“核实退出并恢复连接”，保留原数据目录。"):s.onboarding?.stage==='review_device_connection'?guideStages.review_device_connection[1]:t("激活后准备本机连接，再启动专属 Chrome。"));
+uiText($('connection-copy'),()=>c.status==='connected'?t("本机浏览器已接入 EH。现在可以让你的 agent 发起任务。"):c.status==='cleanup_unknown'||s.notice==='previous_connection_unconfirmed'?t("上次退出未获确认。请到连接诊断点击“核实退出并恢复连接”，保留原数据目录。"):s.onboarding?.stage==='review_device_connection'?guideStages.review_device_connection[1]:t("有可用额度后，准备本机连接，再启动专属 Chrome。"));
 $('connect').disabled=busy||!ready||running||Boolean(s.pending)||c.clean===false;$('disconnect').disabled=busy||!running;$('agent-connect').disabled=busy||closing||!s.signed_in||!s.credentials.api_ready;
 $('prepare').disabled=busy||!s.signed_in||running||Boolean(s.pending)||c.clean===false;$('activation-form').querySelector('button').disabled=busy||running||Boolean(s.pending)||cloud?.activation_review_required===true;$('activation-review-note').hidden=cloud?.activation_review_required!==true;$('activation-receipts').disabled=busy||!s.signed_in;$('refresh').disabled=busy||!s.signed_in;$('logout').disabled=busy||running;$('relogin').disabled=busy||running;
 for(const id of ['check','diagnose'])$(id).disabled=busy||!ready;
@@ -152,14 +152,15 @@ uiText($('recovery-progress'),()=>resetFlow.stage==='code'?t("验证码已申请
 for(const id of ['recovery-request-form','recovery-code-form','recovery-reset-form','manual-request-form','manual-confirm-form'])$(id).querySelector('button').disabled=blocked;
 $('acknowledge').disabled=busy||(s.pending?.operation==='appeal_create'&&!appealHistory?.pending_confirmed);
 const sub=cloud?.subscription||{},lifetime=sub.billing==='lifetime_frames'&&sub.metering==='frames'&&sub.expires_at===null&&sub.period_ends_at===null,active=sub.enabled===true&&(lifetime||(typeof sub.expires_at==='number'&&sub.expires_at>Date.now()/1000));
-uiText($('subscription-status'),()=>cloud?(cloud.activation_review_required?t("需运营审核"):active?t("已开通"):sub.enabled?t("已到期"):t("未开通")):t("尚未读取"));uiText($('remaining'),()=>cloud&&typeof sub.remaining==='number'?sub.remaining.toLocaleString(locale()):'—');uiText($('expiry'),()=>lifetime?t("永久有效"):date(sub.expires_at));
+const exhausted=typeof sub.remaining==='number'&&sub.remaining<=0;
+uiText($('subscription-status'),()=>cloud?(cloud.activation_review_required?t("需运营审核"):active?(exhausted?t("额度已用完"):t("已开通")):sub.enabled?t("已到期"):t("未开通")):t("尚未读取"));uiText($('remaining'),()=>cloud&&typeof sub.remaining==='number'?sub.remaining.toLocaleString(locale()):'—');uiText($('expiry'),()=>lifetime?t("永久有效"):date(sub.expires_at));
 const frameMeter=sub.metering==='frames';
 uiText($('remaining-label'),()=>lifetime?t("剩余总额度"):sub.billing==='calendar_month'?t("本期剩余额度"):t("剩余额度"));
 uiText($('billing-period'),()=>lifetime?t("一次性总额度 {p0} 帧 · 已用 {p1} 帧 · 永久有效，用完即止，不按月重置。",{p0:sub.frame_limit?.toLocaleString(locale())??'—',p1:(sub.charged_frames??0).toLocaleString(locale())}):sub.billing==='calendar_month'?t("本期（北京时间）：{p0} — {p1} · 本月额度 {p2} {p3} · 不结转；提前续期不刷新当月额度。",{p0:new Date(sub.period_starts_at*1000).toLocaleString(locale(),{timeZone:'Asia/Shanghai'}),p1:new Date(sub.period_ends_at*1000).toLocaleString(locale(),{timeZone:'Asia/Shanghai'}),p2:(frameMeter?sub.frame_limit:sub.command_limit)?.toLocaleString(locale())??'—',p3:frameMeter?t("帧（成功新感知）"):t("次（旧命令口径）")}):'');
 uiText($('checked-at'),()=>s.cloud_checked_at?t("最近核对：")+date(s.cloud_checked_at)+t(" · 权益以云端最新状态为准"):t("点击刷新账号状态以读取云端权益。"));
 const deviceReview=s.onboarding?.stage==='review_device_connection';
-for(const [id,done] of [['step-account',active],['step-key',ready&&!deviceReview],['step-connect',c.status==='connected']])$(id).classList.toggle('done',done);
-uiText($('step-account-text'),()=>active?t("订阅有效，查看账号页了解剩余额度"):t("获得赠送激活码后，在账号页激活"));uiText($('step-key-text'),()=>deviceReview?t("设备连接待核对，请到连接诊断查看"):ready?t("本机已准备好，连接浏览器后开始任务"):t("点击准备本机使用，完成连接配置"));
+for(const [id,done] of [['step-account',active&&!exhausted],['step-key',ready&&!deviceReview],['step-connect',c.status==='connected']])$(id).classList.toggle('done',done);
+uiText($('step-account-text'),()=>cloud?.activation_review_required?t("账号权益需要运营审核，请到账号页核对"):active?(exhausted?t("额度已用完，请到账号页核对后续额度"):t("额度已就绪，查看账号页了解剩余额度")):sub.enabled?t("订阅已到期。"):t("请到账号页刷新并核对可用额度"));uiText($('step-key-text'),()=>deviceReview?t("设备连接待核对，请到连接诊断查看"):ready?t("本机已准备好，连接浏览器后开始任务"):t("点击准备本机使用，完成连接配置"));
 renderConnectionRepair();
 const errorDetail={...(c.first_error?{first_error:c.first_error}:{}),...(c.browser_cleanup_diagnostic?{browser_cleanup_diagnostic:c.browser_cleanup_diagnostic}:{})};
 uiText($('error-detail'),()=>Object.keys(errorDetail).length?JSON.stringify(errorDetail,null,2):c.status==='cleanup_unknown'?t("浏览器退出未确认。请点击核实退出并恢复连接，保留原数据目录。"):t("暂无连接错误"));
@@ -181,7 +182,7 @@ const pendingConfirmed=appealHistory.pending_confirmed;uiText($('appeal-query-st
 say(()=>op==='appeal_create'?t("申诉已提交，等待运营审核。不会自动解封或发送邮件。"):t("已查询本人申诉，未重发提交。"));}}}
 else if(op==='appeal_release_unknown')say(()=>t("已解除本机提示并保留原请求号，申诉结果仍未知。请查询原编号或联系运营核对；没有重发申诉。"));
 else if(op==='logout'){authMode('login');say(()=>t("已退出登录。"));}
-else if(op==='register'){choose('account');say(()=>t("账号已创建。请发送注册邮箱验证码并完成验证；未验证的邮箱不能用于账号找回。"));}
+else if(op==='register'){const sub=state.cloud?.subscription,granted=state.signed_in&&sub?.enabled===true&&sub.billing==='lifetime_frames'&&sub.metering==='frames'&&sub.expires_at===null&&sub.period_ends_at===null&&sub.frame_limit===1000&&sub.remaining===1000&&(sub.charged_frames??0)===0&&(sub.reserved_frames??0)===0;choose('account');say(()=>(granted?t("账号已创建，已自动获得 1000 帧永久总额度，用完即止，不按月重置。"):t("账号已创建，注册额度尚未确认，请刷新账号状态或联系运营核对。"))+t("请发送注册邮箱验证码并完成验证；未验证的邮箱不能用于账号找回。"));}
 else if(op==='email_code_request')say(()=>t("验证码申请已受理。请查看注册邮箱，只有收到邮件才能确认投递成功；15分钟内有效。"));
 else if(op==='email_code_verify')say(()=>t("注册邮箱已验证，可以用于账号找回。"));
 else if(op==='recovery_code_request'){ $('recovery-details').open=true;say(()=>t("申请已受理。若邮箱已验证且可找回，你会收到验证码；请检查收件箱和垃圾邮件。"));}

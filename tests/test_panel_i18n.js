@@ -50,7 +50,7 @@ function page(options={}){
   history:{replaceState(...args){historyCalls.push(args);}},navigator:{language:options.browser||'zh-CN',onLine:true,clipboard:{writeText:async text=>clipboard.push(text)}},
   window:{scrollTo(){}},confirm:text=>{confirmations.push(text);return false;},
   fetch:async(url,request)=>{calls.push({url,request});const values={
-   '/api/state':fixture,'/api/refresh':{status:'refreshed'},
+   '/api/state':fixture,'/api/refresh':{status:'refreshed'},'/api/register':{status:'registered'},
    '/api/agent_connect':{host:'generic',host_connection:'not_verified',contains_credentials:false,path:'/tmp/原文 "目录"/CONNECT.md',instruction:'读取本机原文指令。'},
    '/api/diagnose':{status:'checked',mode:'online',api_health_ok:true,device_authentication:'not_tested',error:'远端原文_CODE'},
    '/api/activation_receipts':{pending_confirmed:false,receipts:[{redeemed_at:1000,plan_id:'原文_plan',billing:'lifetime_frames',frames:5000,request_id:'原文_request'}]}};
@@ -118,7 +118,7 @@ async function main(){
  await test('English text fragments stay separated when line breaks are hidden',()=>{
   const app=page({saved:'en'});
   assert.equal(app.run("t('把网页能力')+t('接入你的 agent。')"),'Bring web capabilities to your agent.');
-  assert.equal(app.run("t('注册账号，申请赠送激活码，')+t('连接浏览器后按额度使用。')"),'Register, request a complimentary code, then connect your browser and use your quota.');
+  assert.equal(app.run("t('注册账号，自动获得 1000 帧，')+t('连接浏览器后按额度使用。')"),'Register to receive 1,000 frames automatically, then connect your browser and use your quota.');
   assert.match('test@example.invalid'+app.run("t('也可在站内提交并查询处理结果。')"),/invalid You can also/);
   app.switch('zh-CN');assert.equal(app.run("t('把网页能力')+t('接入你的 agent。')"),'把网页能力接入你的 agent。');
  });
@@ -142,6 +142,49 @@ async function main(){
   app.switch('en');assert.equal(app.element('feedback').textContent,'Incorrect username or password.');
   app.run("fixture.cloud.subscription={billing:'calendar_month',metering:'frames',enabled:true,expires_at:Date.now()/1000+3600,period_starts_at:1000,period_ends_at:2000,frame_limit:3000};render()");
   assert.match(app.element('billing-period').textContent,/Current period \(Beijing time\)/);
+ });
+ await test('registration confirms the fixed quota from refreshed cloud state in both languages',async()=>{
+  const app=page({saved:'en'});
+  app.fixture.cloud.subscription={billing:'lifetime_frames',metering:'frames',enabled:true,expires_at:null,period_ends_at:null,frame_limit:1000,remaining:1000,charged_frames:0,reserved_frames:0};
+  await app.run("act('register')");
+  assert.match(app.element('feedback').textContent,/automatically received a lifetime total of 1,000 frames/);
+  assert.match(app.element('feedback').textContent,/no monthly reset/);
+  assert.match(app.element('feedback').textContent,/registration email code/);
+  app.switch('zh-CN');assert.match(app.element('feedback').textContent,/已自动获得 1000 帧永久总额度/);
+  assert.equal(app.calls.filter(call=>call.url==='/api/register').length,1);
+  assert.equal(app.calls.filter(call=>call.url==='/api/refresh').length,1);
+  assert.ok(app.calls.every(call=>!['/api/redeem','/api/prepare'].includes(call.url)));
+ });
+ await test('registration never claims quota when the service has not confirmed the fixed grant',async()=>{
+  const subscriptions=[{},
+   {billing:'lifetime_frames',metering:'frames',enabled:false,expires_at:null,period_ends_at:null,frame_limit:1000,remaining:1000},
+   {billing:'lifetime_frames',metering:'frames',enabled:true,expires_at:null,period_ends_at:null,frame_limit:1000,remaining:999,charged_frames:1},
+   {billing:'calendar_month',metering:'frames',enabled:true,expires_at:Date.now()/1000+3600,period_ends_at:Date.now()/1000+3600,frame_limit:1000,remaining:1000}];
+  for(const subscription of subscriptions){
+   const app=page({saved:'en'});app.fixture.cloud.subscription=subscription;await app.run("act('register')");
+   assert.match(app.element('feedback').textContent,/registration quota is not confirmed/);
+   assert.doesNotMatch(app.element('feedback').textContent,/automatically received/);
+   app.switch('zh-CN');assert.match(app.element('feedback').textContent,/注册额度尚未确认/);
+   assert.equal(app.calls.filter(call=>call.url==='/api/register').length,1);
+  }
+ });
+ await test('missing quota, expired access, exhausted quota, and review remain distinct',()=>{
+  const app=page({saved:'en'});
+  app.fixture.cloud.subscription.remaining=0;app.run('render()');
+  assert.equal(app.element('subscription-status').textContent,'Quota used up');
+  assert.match(app.element('step-account-text').textContent,/Quota is used up/);
+  app.fixture.cloud.activation_review_required=true;app.run('render()');
+  assert.equal(app.element('subscription-status').textContent,'Support review needed');
+  assert.match(app.element('step-account-text').textContent,/needs support review/);
+  app.fixture.cloud.activation_review_required=false;
+  app.fixture.cloud.subscription={enabled:true,billing:'calendar_month',expires_at:1,remaining:500};app.run('render()');
+  assert.equal(app.element('subscription-status').textContent,'Expired');
+  assert.equal(app.element('step-account-text').textContent,'The subscription has expired.');
+  app.fixture.cloud.subscription={enabled:false};app.fixture.onboarding.stage='activation';app.run('render()');
+  assert.equal(app.element('subscription-status').textContent,'Not activated');
+  assert.match(app.element('guide-copy').textContent,/no available access displayed yet/);
+  assert.doesNotMatch(app.element('guide-copy').textContent,/email.*request.*code/i);
+  assert.equal(app.calls.length,0);
  });
  await test('user inputs, masked email, raw diagnostics, appeal content, and credentials are not translated',async()=>{
   const app=page({saved:'en'});app.element('auth-form:password').value='原文 password Key';app.element('support-preview').value='原文 report';
